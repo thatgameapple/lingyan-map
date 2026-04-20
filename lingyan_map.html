@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; background: #b5aa98; display: flex; justify-content: center; padding: 20px; }
+</style>
+</head>
+<body>
+<svg width="900" height="480" viewBox="0 0 900 480"
+     xmlns="http://www.w3.org/2000/svg"
+     style="font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;">
+
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#faf3e4"/>
+      <stop offset="55%"  stop-color="#f5ebd6"/>
+      <stop offset="100%" stop-color="#ebe0c8"/>
+    </linearGradient>
+    <linearGradient id="mtn1" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%"   stop-color="#b8d282"/>
+      <stop offset="100%" stop-color="#8ab060"/>
+    </linearGradient>
+    <linearGradient id="mtn2" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%"   stop-color="#a8c870"/>
+      <stop offset="100%" stop-color="#7ea84e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 底色 -->
+  <rect width="900" height="480" fill="url(#bgGrad)"/>
+
+  <!-- 外框：双线 + 四角L形 -->
+  <rect x="8"  y="8"  width="884" height="464" fill="none" stroke="#9e7528" stroke-width="1.6" rx="3"/>
+  <rect x="13" y="13" width="874" height="454" fill="none" stroke="#c0a050" stroke-width="0.6" rx="2" opacity="0.45"/>
+  <path d="M 8 34 L 8 8 L 34 8"   fill="none" stroke="#7a5a18" stroke-width="3" stroke-linecap="square"/>
+  <path d="M 866 8 L 892 8 L 892 34"  fill="none" stroke="#7a5a18" stroke-width="3" stroke-linecap="square"/>
+  <path d="M 8 446 L 8 472 L 34 472"  fill="none" stroke="#7a5a18" stroke-width="3" stroke-linecap="square"/>
+  <path d="M 866 472 L 892 472 L 892 446" fill="none" stroke="#7a5a18" stroke-width="3" stroke-linecap="square"/>
+
+  <!-- 山体 -->
+  <path d="M 0 480 L 0 240 Q 25 180 55 140 Q 88 98 118 94 Q 148 91 162 118 Q 175 145 165 192 Q 152 245 148 305 Q 143 365 146 425 Q 144 462 125 475 Q 75 482 0 480 Z"
+        fill="url(#mtn1)" opacity="0.56"/>
+  <path d="M 0 480 L 0 295 Q 18 240 42 195 Q 68 148 92 138 Q 110 132 118 155 Q 126 178 112 222 Q 96 272 92 332 Q 86 392 90 448 Q 85 475 60 480 Z"
+        fill="url(#mtn2)" opacity="0.50"/>
+  <polygon points="118,92 98,138 138,138" fill="#7ea058" opacity="0.60"/>
+  <!-- 等高线 -->
+  <path d="M 15,358 Q 48,340 76,354 Q 100,366 114,342" fill="none" stroke="#68904a" stroke-width="0.9" opacity="0.25"/>
+  <path d="M 10,298 Q 40,278 68,293 Q 90,306 106,283" fill="none" stroke="#68904a" stroke-width="0.9" opacity="0.20"/>
+  <path d="M 18,238 Q 45,220 70,236 Q 90,248 105,227" fill="none" stroke="#68904a" stroke-width="0.9" opacity="0.16"/>
+
+  <!-- 农田 -->
+  <ellipse cx="340" cy="463" rx="162" ry="24" fill="#c8e090" opacity="0.32"/>
+  <ellipse cx="500" cy="473" rx="128" ry="18" fill="#bfd888" opacity="0.28"/>
+
+  <!-- 枣林村建筑（降低对比，作为背景肌理） -->
+  <g opacity="0.42">
+    <rect x="638" y="112" width="15" height="11" fill="#d5c490" stroke="#b0a060" stroke-width="0.7" rx="1"/>
+    <polygon points="636,112 645.5,105 655,112"  fill="#b07040" opacity="0.78"/>
+    <rect x="657" y="108" width="13" height="10" fill="#cdbf88" stroke="#a89858" stroke-width="0.7" rx="1"/>
+    <polygon points="655,108 663.5,101 673,108"  fill="#a06838" opacity="0.78"/>
+    <rect x="674" y="115" width="14" height="10" fill="#d5c490" stroke="#b0a060" stroke-width="0.7" rx="1"/>
+    <polygon points="672,115 681,108 690,115"    fill="#b07040" opacity="0.78"/>
+    <rect x="690" y="110" width="12" height="9"  fill="#c8b880" stroke="#a09050" stroke-width="0.7" rx="1"/>
+    <rect x="705" y="118" width="13" height="9"  fill="#d5c490" stroke="#b0a060" stroke-width="0.7" rx="1"/>
+    <polygon points="703,118 711.5,111 721,118"  fill="#b07040" opacity="0.78"/>
+    <rect x="644" y="126" width="11" height="9"  fill="#cdbf88" stroke="#a89858" stroke-width="0.7" rx="1"/>
+    <polygon points="642,126 649.5,119 658,126"  fill="#a06838" opacity="0.72"/>
+    <rect x="660" y="123" width="12" height="9"  fill="#d5c490" stroke="#b0a060" stroke-width="0.7" rx="1"/>
+    <rect x="678" y="126" width="13" height="8"  fill="#c8b880" stroke="#a09050" stroke-width="0.7" rx="1"/>
+    <rect x="695" y="128" width="12" height="8"  fill="#d5c490" stroke="#b0a060" stroke-width="0.7" rx="1"/>
+    <text x="672" y="149" text-anchor="middle" font-size="8.5" fill="#7a5828" letter-spacing="1">枣林村</text>
+  </g>
+
+  <!-- 中部建筑群 -->
+  <g opacity="0.32">
+    <rect x="500" y="354" width="18" height="13" fill="#d0b880" stroke="#a88848" stroke-width="0.8" rx="1"/>
+    <polygon points="498,354 509,346 520,354" fill="#986020" opacity="0.85"/>
+    <rect x="522" y="350" width="16" height="12" fill="#c8b078" stroke="#a08040" stroke-width="0.8" rx="1"/>
+    <polygon points="520,350 530,342 540,350" fill="#886018" opacity="0.85"/>
+    <rect x="542" y="356" width="14" height="12" fill="#d0b880" stroke="#a88848" stroke-width="0.8" rx="1"/>
+    <polygon points="540,356 549,348 558,356" fill="#986020" opacity="0.85"/>
+  </g>
+
+  <!-- 灵岩寺背景建筑 -->
+  <g opacity="0.36">
+    <rect x="457" y="194" width="15" height="11" fill="#c8a870" stroke="#a08040" stroke-width="0.7" rx="1"/>
+    <path d="M 455,194 Q 464,187 476,194" fill="#985028" opacity="0.85"/>
+    <rect x="476" y="190" width="13" height="10" fill="#c0a068" stroke="#987838" stroke-width="0.7" rx="1"/>
+    <path d="M 474,190 Q 482,183 490,190" fill="#885020" opacity="0.85"/>
+  </g>
+
+  <!-- 松树（山坡） -->
+  <g fill="#548038">
+    <polygon points="158,218 152,236 164,236" opacity="0.60"/>
+    <rect x="155.5" y="236" width="5" height="3.5" fill="#7a5e38" opacity="0.45"/>
+    <polygon points="174,213 168,231 180,231" opacity="0.60"/>
+    <rect x="171"   y="231" width="5" height="3.5" fill="#7a5e38" opacity="0.45"/>
+    <polygon points="167,230 161,248 173,248" opacity="0.56"/>
+    <polygon points="149,254 143,272 155,272" opacity="0.60"/>
+    <polygon points="154,264 149,276 159,276" opacity="0.48"/>
+    <polygon points="169,260 163,278 175,278" opacity="0.55"/>
+    <polygon points="188,248 182,265 194,265" opacity="0.55"/>
+    <rect x="185"   y="265" width="5" height="3.5" fill="#7a5e38" opacity="0.42"/>
+    <polygon points="183,271 177,288 189,288" opacity="0.57"/>
+    <polygon points="199,287 193,304 205,304" opacity="0.54"/>
+    <polygon points="163,304 157,321 169,321" opacity="0.58"/>
+    <polygon points="186,322 180,338 192,338" opacity="0.54"/>
+  </g>
+  <!-- 散点松树 -->
+  <g fill="#46782e" opacity="0.42">
+    <polygon points="548,172 543,188 553,188"/>
+    <polygon points="330,378 325,392 335,392"/>
+    <polygon points="352,388 347,402 357,402"/>
+    <polygon points="240,424 235,437 245,437"/>
+    <polygon points="618,298 613,310 623,310"/>
+    <polygon points="432,370 427,382 437,382"/>
+  </g>
+
+  <!-- ===== 标题 ===== -->
+  <rect x="20" y="15" width="860" height="46" rx="3" fill="#fdf7ed" stroke="#a88a30" stroke-width="0.8" opacity="0.6"/>
+  <text x="450" y="37" text-anchor="middle" font-size="22" font-weight="bold" fill="#22140a" letter-spacing="7">登山路线图</text>
+  <text x="450" y="53" text-anchor="middle" font-size="10" fill="#7a5838" letter-spacing="3.5">太行灵山景区 · 白鹿泉</text>
+  <!-- 分割线 + 装饰点 -->
+  <line x1="55"  y1="62" x2="380" y2="62" stroke="#a88a30" stroke-width="1" opacity="0.48"/>
+  <circle cx="390" cy="62" r="2"   fill="#a88a30" opacity="0.62"/>
+  <circle cx="450" cy="62" r="3"   fill="#8a6820"/>
+  <circle cx="510" cy="62" r="2"   fill="#a88a30" opacity="0.62"/>
+  <line x1="520" y1="62" x2="845" y2="62" stroke="#a88a30" stroke-width="1" opacity="0.48"/>
+
+  <!-- ===== 路线（路径坐标完全不变）===== -->
+  <!-- 路线①橙色 -->
+  <path d="M 65 438
+           C 155 438 228 422 272 408
+           C 318 378 362 340 392 328
+           C 540 275 680 218 790 210
+           L 858 200"
+        fill="none" stroke="#d06818" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(560,258)">
+    <rect x="-22" y="-12" width="52" height="18" rx="9" fill="#d06818"/>
+    <text x="4" y="3" text-anchor="middle" font-size="9" fill="white" font-weight="bold">路线1</text>
+  </g>
+  <polygon points="858,192 852,204 864,204" fill="#d06818"/>
+
+  <!-- 路线②蓝色 -->
+  <path d="M 65 438
+           C 112 448 172 452 225 448
+           C 275 442 338 455 382 460
+           C 412 462 432 460 445 454
+           C 472 445 496 418 522 400
+           C 568 375 642 318 760 270"
+        fill="none" stroke="#2878c8" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(310,458)">
+    <rect x="-22" y="-12" width="52" height="18" rx="9" fill="#2878c8"/>
+    <text x="4" y="3" text-anchor="middle" font-size="9" fill="white" font-weight="bold">路线2</text>
+  </g>
+  <g transform="translate(195,432) rotate(-10)"><polygon points="0,-6 5,4 0,2 -5,4" fill="#d06818"/></g>
+  <g transform="translate(630,338) rotate(-22)"><polygon points="0,-6 5,4 0,2 -5,4" fill="#2878c8"/></g>
+
+  <!-- ===== 景点节点 ===== -->
+  <!-- 色彩系统：主景点 #b86018，设施 #3d78a8，餐饮 #2d7828，最高处 #5c3d12 -->
+
+  <!-- 最高处·亭子 -->
+  <circle cx="65" cy="438" r="12" fill="#5c3d12" stroke="white" stroke-width="2.8"/>
+  <polygon points="65,428 57,436 73,436" fill="white" opacity="0.90"/>
+  <rect x="60" y="436" width="10" height="5" fill="white" opacity="0.70"/>
+  <line x1="62" y1="436" x2="62" y2="441" stroke="#5c3d12" stroke-width="1.2" opacity="0.4"/>
+  <line x1="68" y1="436" x2="68" y2="441" stroke="#5c3d12" stroke-width="1.2" opacity="0.4"/>
+  <g transform="translate(0,418)">
+    <rect x="0" y="0" width="84" height="22" rx="4" fill="#5c3d12"/>
+    <text x="42" y="15" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">最高处·亭子</text>
+  </g>
+
+  <!-- 灵岩寺 -->
+  <circle cx="476" cy="202" r="10" fill="#b86018" stroke="white" stroke-width="2.5"/>
+  <polygon points="476,193 469,202 483,202" fill="white" opacity="0.90"/>
+  <rect x="471" y="202" width="10" height="4" fill="white" opacity="0.70"/>
+  <line x1="476" y1="202" x2="476" y2="206" stroke="#b86018" stroke-width="1" opacity="0.4"/>
+  <g transform="translate(426,180)">
+    <rect x="0" y="0" width="68" height="20" rx="4" fill="#b86018"/>
+    <text x="34" y="14" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">灵岩寺</text>
+  </g>
+
+  <!-- 素食餐厅（刀叉图标） -->
+  <circle cx="560" cy="180" r="10" fill="#2d7828" stroke="white" stroke-width="2.5"/>
+  <line x1="556" y1="175" x2="556" y2="185" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="554.5" y1="175" x2="555.3" y2="179" stroke="white" stroke-width="1"   stroke-linecap="round"/>
+  <line x1="557.5" y1="175" x2="556.7" y2="179" stroke="white" stroke-width="1"   stroke-linecap="round"/>
+  <ellipse cx="563" cy="175" rx="2" ry="2.2" fill="white" opacity="0.92"/>
+  <line x1="563" y1="177" x2="563" y2="185" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+  <g transform="translate(572,168)">
+    <rect x="0" y="0" width="76" height="20" rx="4" fill="#2d7828"/>
+    <text x="38" y="14" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">素食餐厅</text>
+  </g>
+
+  <!-- 小卖部 -->
+  <circle cx="390" cy="308" r="9" fill="#3d78a8" stroke="white" stroke-width="2.2"/>
+  <rect x="386" y="306" width="8" height="5" fill="white" opacity="0.82" rx="0.5"/>
+  <polygon points="385,306 390,301 395,306" fill="white" opacity="0.62"/>
+  <g transform="translate(400,296)">
+    <rect x="0" y="0" width="58" height="20" rx="4" fill="#3d78a8"/>
+    <text x="29" y="14" text-anchor="middle" font-size="9" fill="white" font-weight="bold">小卖部</text>
+  </g>
+
+  <!-- 流量部 -->
+  <circle cx="500" cy="382" r="9" fill="#a04a18" stroke="white" stroke-width="2.2"/>
+  <g transform="translate(510,370)">
+    <rect x="0" y="0" width="58" height="20" rx="4" fill="#a04a18"/>
+    <text x="29" y="14" text-anchor="middle" font-size="9" fill="white" font-weight="bold">流量部</text>
+  </g>
+
+  <!-- 融道学府（特殊：双圆） -->
+  <circle cx="292" cy="390" r="10" fill="#b86018" stroke="white" stroke-width="2.5"/>
+  <circle cx="292" cy="390" r="4"  fill="white"/>
+  <g transform="translate(304,378)">
+    <rect x="0" y="0" width="80" height="20" rx="4" fill="#b86018"/>
+    <text x="40" y="14" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">融道学府</text>
+  </g>
+
+  <!-- 厕所 -->
+  <circle cx="468" cy="408" r="9" fill="#3d78a8" stroke="white" stroke-width="2.2"/>
+  <text x="468" y="412" text-anchor="middle" font-size="6.5" fill="white" font-weight="bold">WC</text>
+  <g transform="translate(478,396)">
+    <rect x="0" y="0" width="46" height="20" rx="4" fill="#3d78a8"/>
+    <text x="23" y="14" text-anchor="middle" font-size="9" fill="white" font-weight="bold">厕所</text>
+  </g>
+
+  <!-- 财富宝塔（三层塔图标） -->
+  <circle cx="760" cy="270" r="11" fill="#b86018" stroke="white" stroke-width="2.5"/>
+  <polygon points="760,261 756,265 764,265" fill="white" opacity="0.90"/>
+  <polygon points="760,265 755,270 765,270" fill="white" opacity="0.72"/>
+  <polygon points="760,270 754,275 766,275" fill="white" opacity="0.54"/>
+  <rect x="758" y="275" width="4" height="3" fill="white" opacity="0.46"/>
+  <g transform="translate(774,258)">
+    <rect x="0" y="0" width="76" height="20" rx="4" fill="#b86018"/>
+    <text x="38" y="14" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">财富宝塔</text>
+  </g>
+
+  <!-- 八卦田（升级为正式景点，移至右上空白区） -->
+  <!-- 虚线连接路线1出口 -->
+  <line x1="808" y1="204" x2="822" y2="158" stroke="#9a8060" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.50"/>
+  <circle cx="830" cy="120" r="10" fill="#b86018" stroke="white" stroke-width="2.5"/>
+  <!-- 八卦图标：三横线 -->
+  <line x1="824" y1="117" x2="836" y2="117" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="824" y1="120" x2="836" y2="120" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="824" y1="123" x2="836" y2="123" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+  <g transform="translate(790,134)">
+    <rect x="0" y="0" width="68" height="20" rx="4" fill="#b86018"/>
+    <text x="34" y="14" text-anchor="middle" font-size="9.5" fill="white" font-weight="bold">八卦田</text>
+  </g>
+
+  <!-- ===== 图例 ===== -->
+  <g transform="translate(62,70)">
+    <rect x="0" y="0" width="272" height="46" rx="5" fill="white" stroke="#a88a30" stroke-width="1.1" opacity="0.92"/>
+    <!-- 路线 -->
+    <line x1="10" y1="13" x2="42" y2="13" stroke="#d06818" stroke-width="5" stroke-linecap="round"/>
+    <text x="49" y="17" font-size="8.5" fill="#22140a">路线1（可双向）</text>
+    <line x1="148" y1="13" x2="180" y2="13" stroke="#2878c8" stroke-width="5" stroke-linecap="round"/>
+    <text x="187" y="17" font-size="8.5" fill="#22140a">路线2（可双向）</text>
+    <!-- 图标行 -->
+    <circle cx="18" cy="33" r="5" fill="#3d78a8" stroke="white" stroke-width="1"/>
+    <text x="28" y="37" font-size="8.5" fill="#22140a">设施</text>
+    <!-- 餐饮 -->
+    <circle cx="80" cy="33" r="5" fill="#2d7828" stroke="white" stroke-width="1"/>
+    <line x1="78" y1="30" x2="78" y2="36"   stroke="white" stroke-width="1.1" stroke-linecap="round"/>
+    <line x1="77" y1="30" x2="77.5" y2="32.5" stroke="white" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="79" y1="30" x2="78.5" y2="32.5" stroke="white" stroke-width="0.8" stroke-linecap="round"/>
+    <ellipse cx="82" cy="30" rx="1.5" ry="1.6" fill="white" opacity="0.92"/>
+    <line x1="82" y1="31.6" x2="82" y2="36"  stroke="white" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="90" y="37" font-size="8.5" fill="#22140a">餐饮</text>
+    <!-- 景点 -->
+    <circle cx="140" cy="33" r="5" fill="#b86018" stroke="white" stroke-width="1"/>
+    <text x="150" y="37" font-size="8.5" fill="#22140a">景点</text>
+    <!-- 最高处 -->
+    <circle cx="205" cy="33" r="5" fill="#5c3d12" stroke="white" stroke-width="1"/>
+    <polygon points="205,28 201,33 209,33" fill="white" opacity="0.88"/>
+    <text x="215" y="37" font-size="8.5" fill="#22140a">最高处</text>
+  </g>
+
+  <!-- ===== 指北针 ===== -->
+  <g transform="translate(848,440)">
+    <circle cx="0" cy="0" r="22" fill="white" stroke="#a88a30" stroke-width="1.4"/>
+    <line x1="0" y1="-18" x2="0" y2="-14" stroke="#ccc" stroke-width="0.8"/>
+    <line x1="18"  y1="0" x2="14"  y2="0" stroke="#ccc" stroke-width="0.8"/>
+    <line x1="0"  y1="18" x2="0"  y2="14" stroke="#ccc" stroke-width="0.8"/>
+    <line x1="-18" y1="0" x2="-14" y2="0" stroke="#ccc" stroke-width="0.8"/>
+    <polygon points="0,-16 3.5,0 0,-3 -3.5,0" fill="#b82018"/>
+    <polygon points="0, 16 3.5,0 0, 3 -3.5,0" fill="#bbb"/>
+    <circle cx="0" cy="0" r="2.5" fill="white" stroke="#aaa" stroke-width="0.8"/>
+    <text x="0" y="-6" text-anchor="middle" font-size="8" font-weight="bold" fill="#b82018">北</text>
+  </g>
+
+  <!-- ===== 比例尺 ===== -->
+  <g transform="translate(62,395)">
+    <line x1="0"  y1="4" x2="0"  y2="10" stroke="#888" stroke-width="1.5"/>
+    <rect x="0"   y="5" width="48" height="4" fill="#888"/>
+    <rect x="48"  y="5" width="48" height="4" fill="#ccc"/>
+    <line x1="96" y1="4" x2="96" y2="10" stroke="#888" stroke-width="1.5"/>
+    <text x="0"  y="20" font-size="8.5" fill="#777">0</text>
+    <text x="38" y="20" font-size="8.5" fill="#777">200m</text>
+    <text x="84" y="20" font-size="8.5" fill="#777">400m</text>
+  </g>
+
+</svg>
+</body>
+</html>
