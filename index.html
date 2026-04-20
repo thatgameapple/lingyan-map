@@ -177,6 +177,7 @@ if (isAdmin) {
   document.getElementById('panel').style.display = 'flex';
 }
 
+var canvasRenderer = L.canvas({ padding: 0.5 });
 var map = L.map('map', {
   center: [38.0600, 114.2580], zoom: 16,
   zoomControl: true, doubleClickZoom: false
@@ -239,8 +240,8 @@ function renderLine(pts, existing, color) {
     map.removeLayer(existing);
   }
   if (!pts || pts.length < 2) return null;
-  var casing = L.polyline(pts, { color:'white', weight:5.5, opacity:0.38, lineJoin:'round', lineCap:'round' }).addTo(map);
-  var line   = L.polyline(pts, { color:color,   weight:3,   opacity:0.82, lineJoin:'round', lineCap:'round' }).addTo(map);
+  var casing = L.polyline(pts, { color:'white', weight:5.5, opacity:0.38, lineJoin:'round', lineCap:'round', renderer:canvasRenderer }).addTo(map);
+  var line   = L.polyline(pts, { color:color,   weight:3,   opacity:0.82, lineJoin:'round', lineCap:'round', renderer:canvasRenderer }).addTo(map);
   line._casing = casing;
   return line;
 }
@@ -569,29 +570,17 @@ function toggleShotMode(hide) {
 
 function exportHighRes() {
   toggleShotMode(true);
-  // 修复 Leaflet SVG transform，让 html2canvas 能识别
-  var fixed = [];
-  document.querySelectorAll('.leaflet-pane svg').forEach(function(svg) {
-    var t = svg.style.transform || '';
-    var m = t.match(/translate3d\((-?[\d.]+)px,\s*(-?[\d.]+)px/);
-    if (m) {
-      fixed.push({ el: svg, orig: t });
-      svg.style.transform = 'translate(' + m[1] + 'px,' + m[2] + 'px)';
-    }
-  });
   setTimeout(function() {
     html2canvas(document.body, {
       useCORS: true, scale: 2, logging: false, allowTaint: false,
       width: window.innerWidth, height: window.innerHeight
     }).then(function(canvas) {
-      fixed.forEach(function(f){ f.el.style.transform = f.orig; });
       toggleShotMode(false);
       var link = document.createElement('a');
       link.download = '灵山登山路线图.png';
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
     }).catch(function() {
-      fixed.forEach(function(f){ f.el.style.transform = f.orig; });
       toggleShotMode(false);
       alert('导出失败，请手动截图');
     });
