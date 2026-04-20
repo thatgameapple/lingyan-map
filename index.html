@@ -103,14 +103,7 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
   pointer-events:none;
 }
 
-/* 状态栏 */
-#status-bar {
-  position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
-  z-index:1000; background:rgba(10,6,2,0.72); color:white;
-  padding:6px 16px; border-radius:20px; font-size:11px;
-  border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(4px);
-  pointer-events:none; white-space:nowrap;
-}
+#status-bar { display:none; }
 </style>
 </head>
 <body class="">
@@ -240,9 +233,15 @@ function saveRoutesToStorage() {
 }
 
 function renderLine(pts, existing, color) {
-  if (existing) map.removeLayer(existing);
+  if (existing) {
+    if (existing._casing) map.removeLayer(existing._casing);
+    map.removeLayer(existing);
+  }
   if (!pts || pts.length < 2) return null;
-  return L.polyline(pts, { color:color, weight:5.5, opacity:0.92, lineJoin:'round', lineCap:'round' }).addTo(map);
+  var casing = L.polyline(pts, { color:'white', weight:10, opacity:0.55, lineJoin:'round', lineCap:'round' }).addTo(map);
+  var line   = L.polyline(pts, { color:color,   weight:6,  opacity:0.95, lineJoin:'round', lineCap:'round' }).addTo(map);
+  line._casing = casing;
+  return line;
 }
 
 function renderRouteList() {
@@ -279,7 +278,10 @@ function addNewRoute(name, color, pts) {
 
 function clearRoute(r) {
   if (drawing === r) finishDraw();
-  if (r.line) { map.removeLayer(r.line); r.line = null; }
+  if (r.line) {
+    if (r.line._casing) map.removeLayer(r.line._casing);
+    map.removeLayer(r.line); r.line = null;
+  }
   r.pts = [];
   saveRoutesToStorage();
   renderRouteList();
@@ -339,7 +341,10 @@ function undoPoint() {
 function clearDrawing() {
   if (!drawing) return;
   drawing.pts = [];
-  if (drawing.line) { map.removeLayer(drawing.line); drawing.line = null; }
+  if (drawing.line) {
+    if (drawing.line._casing) map.removeLayer(drawing.line._casing);
+    map.removeLayer(drawing.line); drawing.line = null;
+  }
 }
 
 map.on('click', function(e) {
