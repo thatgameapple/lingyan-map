@@ -116,10 +116,10 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 <!-- 图例（动态生成） -->
 <div id="legend"></div>
 
-<!-- 管理员锁（右下角，普通用户看到也不知道是什么） -->
-<div id="admin-btn" onclick="toggleAdmin()" title="">🔒</div>
+<!-- 管理员模式下显示锁定按钮 -->
+<div id="admin-btn" onclick="toggleAdmin()" title="" style="display:none">🔓</div>
 
-<!-- 右侧控制面板（默认隐藏） -->
+<!-- 右侧控制面板（?admin 时显示） -->
 <div id="panel" style="display:none">
 
   <!-- 底图切换 -->
@@ -167,31 +167,17 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 // ============================================================
 // 管理员模式（默认锁定，密码解锁）
 // ============================================================
-var ADMIN_PASSWORD = 'lingyan2025';  // ← 可以改成你自己的密码
-var isAdmin = false;
+// 网址带 ?admin 自动进入编辑模式，否则只读
+var isAdmin = location.search.includes('admin');
 
 function toggleAdmin() {
+  // 锁定按钮仅在管理员模式下有意义（退出编辑）
   if (isAdmin) {
-    // 已解锁 → 锁定
     isAdmin = false;
     document.getElementById('panel').style.display = 'none';
     document.getElementById('admin-btn').textContent = '🔒';
     document.getElementById('admin-btn').classList.remove('unlocked');
     setMarkersEditable(false);
-    setStatus('标注可拖拽 · 选颜色后点「新增路线」开始绘制 · 点「新建地标」添加标注', null);
-  } else {
-    // 未解锁 → 验证密码
-    var pwd = prompt('请输入管理密码：');
-    if (pwd === ADMIN_PASSWORD) {
-      isAdmin = true;
-      document.getElementById('panel').style.display = 'flex';
-      document.getElementById('admin-btn').textContent = '🔓';
-      document.getElementById('admin-btn').classList.add('unlocked');
-      setMarkersEditable(true);
-      setStatus('管理员模式 · 可编辑标注和路线', '#d06818');
-    } else if (pwd !== null) {
-      alert('密码错误');
-    }
   }
 }
 
@@ -214,6 +200,13 @@ var map = L.map('map', {
 var satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Tiles © Esri', maxZoom:19 });
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 });
 satLayer.addTo(map);
+
+// 管理员模式初始化
+if (isAdmin) {
+  document.getElementById('panel').style.display = 'flex';
+  document.getElementById('admin-btn').style.display = 'flex';
+  document.getElementById('admin-btn').classList.add('unlocked');
+}
 
 function switchLayer(t) {
   if (t === 'sat') { map.removeLayer(osmLayer); satLayer.addTo(map); }
