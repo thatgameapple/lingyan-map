@@ -30,18 +30,6 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 .l-line { width:24px; height:4px; border-radius:2px; flex-shrink:0; }
 .l-dot  { width:10px; height:10px; border-radius:50%; border:2px solid white; flex-shrink:0; }
 
-/* 管理员锁按钮 */
-#admin-btn {
-  position:absolute; bottom:18px; right:18px; z-index:1001;
-  background:rgba(10,6,2,0.55); color:rgba(255,255,255,0.45);
-  border:1px solid rgba(255,255,255,0.15); border-radius:50%;
-  width:32px; height:32px; font-size:14px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  backdrop-filter:blur(4px); transition:all 0.2s;
-}
-#admin-btn:hover { background:rgba(40,20,5,0.75); color:white; }
-#admin-btn.unlocked { background:rgba(180,90,10,0.80); color:white; border-color:#d8a040; }
-
 /* 右侧控制面板 */
 #panel {
   position:absolute; top:14px; right:14px; z-index:1000;
@@ -116,10 +104,7 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 <!-- 图例（动态生成） -->
 <div id="legend"></div>
 
-<!-- 管理员模式下显示锁定按钮 -->
-<div id="admin-btn" onclick="toggleAdmin()" title="" style="display:none">🔓</div>
-
-<!-- 右侧控制面板（?admin 时显示） -->
+<!-- 右侧控制面板（管理员模式 ?admin 才显示） -->
 <div id="panel" style="display:none">
 
   <!-- 底图切换 -->
@@ -161,38 +146,18 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 
 </div>
 
-<div id="status-bar">标注可拖拽 · 选颜色后点「新增路线」开始绘制 · 点「新建地标」添加标注</div>
+<div id="status-bar">太行灵山景区 · 白鹿泉 登山路线图</div>
 
 <script>
 // ============================================================
-// 管理员模式（默认锁定，密码解锁）
-// ============================================================
-// 网址带 ?admin 自动进入编辑模式，否则只读
-var isAdmin = location.search.includes('admin');
-
-function toggleAdmin() {
-  // 锁定按钮仅在管理员模式下有意义（退出编辑）
-  if (isAdmin) {
-    isAdmin = false;
-    document.getElementById('panel').style.display = 'none';
-    document.getElementById('admin-btn').textContent = '🔒';
-    document.getElementById('admin-btn').classList.remove('unlocked');
-    setMarkersEditable(false);
-  }
-}
-
-var allMarkers = [];  // 记录所有标注，用于切换可拖拽状态
-
-function setMarkersEditable(editable) {
-  allMarkers.forEach(function(m) {
-    if (editable) m.dragging.enable();
-    else m.dragging.disable();
-  });
-}
-
-// ============================================================
 // 地图初始化
 // ============================================================
+// 管理员模式：URL 含 ?admin 才能编辑
+var isAdmin = location.search.includes('admin');
+if (isAdmin) {
+  document.getElementById('panel').style.display = 'flex';
+}
+
 var map = L.map('map', {
   center: [38.0600, 114.2580], zoom: 16,
   zoomControl: true, doubleClickZoom: false
@@ -200,13 +165,6 @@ var map = L.map('map', {
 var satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Tiles © Esri', maxZoom:19 });
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 });
 satLayer.addTo(map);
-
-// 管理员模式初始化
-if (isAdmin) {
-  document.getElementById('panel').style.display = 'flex';
-  document.getElementById('admin-btn').style.display = 'flex';
-  document.getElementById('admin-btn').classList.add('unlocked');
-}
 
 function switchLayer(t) {
   if (t === 'sat') { map.removeLayer(osmLayer); satLayer.addTo(map); }
@@ -454,8 +412,7 @@ function poiIcon(name, color) {
 }
 
 function addPOI(latlng, name, color, isCustom) {
-  var marker = L.marker(latlng, { icon: poiIcon(name, color), draggable: false, zIndexOffset: 500 }).addTo(map);
-  allMarkers.push(marker);
+  var marker = L.marker(latlng, { icon: poiIcon(name, color), draggable: isAdmin, zIndexOffset: 500 }).addTo(map);
   marker.on('dragend', function(e) {
     savePos(name, e.target.getLatLng());
     if (isCustom) {
@@ -555,6 +512,7 @@ function renderLegend() {
 // 状态栏
 // ============================================================
 function setStatus(text, color) {
+  if (!isAdmin) return; // 非管理员不显示操作提示
   var el = document.getElementById('status-bar');
   el.textContent = text;
   el.style.borderColor = color ? color : 'rgba(255,255,255,0.18)';
