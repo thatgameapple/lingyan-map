@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
+<html><head>
 <meta charset="UTF-8">
 <title>灵山景区登山路线 · 卫星图</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 * { box-sizing: border-box; }
@@ -73,14 +71,17 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 .route-btn    { background:none; border:none; color:rgba(255,255,255,0.75); cursor:pointer; font-size:12px; padding:1px 3px; }
 .route-btn:hover { color:white; }
 
-/* 画线进行中的控制条 */
+/* 画线进行中的控制条 - 底部浮动 */
 #draw-ctrl {
-  display:none; width:100%;
-  background:rgba(10,6,2,0.75); border:1px solid rgba(255,255,255,0.2);
-  border-radius:5px; padding:6px 8px; backdrop-filter:blur(4px);
+  display:none;
+  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+  z-index:1001;
+  background:rgba(10,6,2,0.88); border:1px solid rgba(255,255,255,0.3);
+  border-radius:8px; padding:8px 14px; backdrop-filter:blur(6px);
+  white-space:nowrap;
 }
-#draw-ctrl .label { font-size:10px; color:rgba(255,255,255,0.65); margin-bottom:5px; }
-#draw-ctrl .btns  { display:flex; gap:5px; flex-wrap:wrap; }
+#draw-ctrl .label { font-size:11px; color:rgba(255,255,255,0.75); margin-bottom:6px; text-align:center; }
+#draw-ctrl .btns  { display:flex; gap:7px; align-items:center; }
 
 /* 状态栏 */
 #status-bar {
@@ -92,9 +93,9 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 }
 </style>
 </head>
-<body>
+<body class="">
 
-<div id="map"></div>
+<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative; outline-style: none;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(7795px, -1234px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 19; transform: translate3d(-3643px, 852px, 0px) scale(1);"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 1112px, 0px); opacity: 1;"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, -2px, 0px) scale(2);"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="1814" height="967" viewBox="-7946 1153 1814 967" style="transform: translate3d(-7946px, 1153px, 0px);"><g><path class="leaflet-interactive" stroke="#e07020" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-6480 1362L-6487 1386L-6500 1412L-6516 1436L-6533 1472L-6555 1510L-6559 1512L-6572 1510L-6582 1503L-6615 1471L-6633 1464L-6650 1454L-6676 1431L-6706 1424L-6732 1420L-6782 1438L-6791 1443L-6858 1469L-6879 1475L-6912 1489L-6954 1514L-7012 1543L-7028 1549L-7092 1566L-7192 1607L-7301 1640L-7343 1650L-7356 1656L-7369 1659L-7390 1670L-7402 1684L-7423 1693L-7434 1696L-7456 1717L-7486 1738L-7502 1746L-7511 1750L-7516 1746L-7556 1746L-7575 1751L-7605 1771L-7614 1775L-7623 1794L-7629 1803L-7636 1810L-7643 1797L-7657 1796"></path><path class="leaflet-interactive" stroke="#2878c8" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-6890 1482L-6885 1489L-6877 1487L-6860 1479L-6839 1475L-6810 1489L-6787 1498L-6783 1504L-6782 1509L-6786 1522L-6795 1541L-6804 1555L-6838 1580L-6919 1603L-6949 1633L-6997 1674L-7003 1681L-7006 1689L-7010 1693L-7027 1700L-7052 1706L-7072 1714L-7090 1730L-7100 1743L-7110 1745L-7127 1755L-7132 1767L-7152 1774L-7167 1775L-7183 1780L-7208 1815L-7226 1823L-7251 1831L-7264 1839L-7280 1854L-7284 1855L-7301 1853L-7310 1850L-7323 1850L-7344 1854L-7363 1854L-7379 1856L-7415 1868L-7443 1880L-7457 1888L-7463 1893L-7464 1897L-7475 1915L-7479 1918L-7504 1922L-7519 1930L-7529 1933L-7549 1927L-7566 1924L-7572 1890L-7568 1881L-7562 1878L-7562 1832L-7560 1812L-7557 1799L-7550 1785L-7538 1773L-7535 1766L-7530 1760L-7525 1756L-7512 1750"></path><path class="leaflet-interactive" stroke="#28a040" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-7562 1877L-7560 1878L-7557 1874L-7551 1862L-7535 1860L-7531 1835L-7520 1820L-7503 1813L-7494 1821L-7481 1818L-7473 1814L-7459 1800L-7449 1795L-7443 1788L-7428 1776L-7405 1762L-7388 1756L-7380 1750L-7371 1747L-7364 1747L-7351 1742L-7337 1732L-7303 1723L-7284 1703L-7265 1696L-7255 1686L-7224 1669L-7187 1655L-7131 1620L-7120 1610L-7080 1563"></path><path class="leaflet-interactive" stroke="#8040c0" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-7012 1693L-7022 1695L-7063 1690L-7075 1693L-7118 1710L-7134 1734L-7143 1739L-7153 1740L-7163 1735L-7183 1729L-7215 1732L-7220 1736L-7228 1747L-7234 1750L-7241 1750L-7247 1747L-7251 1748L-7261 1760L-7290 1757L-7303 1770L-7322 1771L-7347 1782L-7356 1784L-7359 1790L-7368 1793L-7379 1791L-7400 1801L-7441 1809L-7445 1808L-7449 1801L-7450 1795"></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7663px, 1792px, 0px); z-index: 2292;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#5c3d12;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#5c3d12;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">最高处·亭子</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6921px, 1411px, 0px); z-index: 1911;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">灵岩寺</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6864px, 1384px, 0px); z-index: 1884;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#2d7828;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#2d7828;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">素食餐厅</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6986px, 1519px, 0px); z-index: 2019;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#3d78a8;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#3d78a8;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;" class="">小卖部</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6872px, 1510px, 0px); z-index: 2010;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#a04a18;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#a04a18;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;" class="">流量部</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7007px, 1584px, 0px); z-index: 2084;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">融道学府</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6903px, 1525px, 0px); z-index: 2025;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#3d78a8;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#3d78a8;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">厕所</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6713px, 1488px, 0px); z-index: 1988;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">财富宝塔</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6566px, 1390px, 0px); z-index: 1890;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">八卦田</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7146px, 1665px, 0px); z-index: 2165;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#8040c0;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#8040c0;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">萌宠乐园遗址</div></div></div></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(2.74276e+07px, 1.29354e+07px, 0px) scale(65536);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> Tiles © Esri</div></div></div></div>
 
 <div id="title-box">
   <h2>登山路线图</h2>
@@ -102,7 +103,7 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 </div>
 
 <!-- 图例（动态生成） -->
-<div id="legend"></div>
+<div id="legend"><div class="sec">路线</div><div class="row"><div class="l-line" style="background:#e07020"></div><span>路线1</span></div><div class="row"><div class="l-line" style="background:#2878c8"></div><span>路线2</span></div><div class="row"><div class="l-line" style="background:#28a040"></div><span>路线9</span></div><div class="row"><div class="l-line" style="background:#8040c0"></div><span>路线10</span></div><div class="sec">标注</div><div class="row"><div class="l-dot" style="background:#b86018"></div><span>景点</span></div><div class="row"><div class="l-dot" style="background:#3d78a8"></div><span>设施</span></div><div class="row"><div class="l-dot" style="background:#2d7828"></div><span>餐饮</span></div><div class="row"><div class="l-dot" style="background:#5c3d12"></div><span>最高处</span></div><div class="sec">自定义</div><div class="row"><div class="l-dot" style="background:#8040c0"></div><span>萌宠乐园遗址</span></div></div>
 
 <!-- 右侧控制面板（管理员模式 ?admin 才显示） -->
 <div id="panel" style="display:none">
@@ -116,27 +117,16 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
   <!-- 颜色选择 -->
   <div class="p-row" style="background:rgba(10,6,2,0.65);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:5px 8px;backdrop-filter:blur(4px);">
     <span style="font-size:10px;color:rgba(255,255,255,0.6);margin-right:2px;">颜色</span>
-    <div id="color-bar"></div>
+    <div id="color-bar"><div class="c-dot" title="#e07020" style="background: rgb(224, 112, 32);"></div><div class="c-dot" title="#2878c8" style="background: rgb(40, 120, 200);"></div><div class="c-dot" title="#d03030" style="background: rgb(208, 48, 48);"></div><div class="c-dot" title="#28a040" style="background: rgb(40, 160, 64);"></div><div class="c-dot selected" title="#8040c0" style="background: rgb(128, 64, 192);"></div><div class="c-dot" title="#c8a020" style="background: rgb(200, 160, 32);"></div><div class="c-dot" title="#c83060" style="background: rgb(200, 48, 96);"></div><div class="c-dot" title="#2090a8" style="background: rgb(32, 144, 168);"></div><div class="c-dot" title="#7a5020" style="background: rgb(122, 80, 32);"></div></div>
   </div>
 
   <!-- 路线列表 -->
-  <div id="route-list"></div>
+  <div id="route-list"><div class="route-row" id="route-row-1"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线1</span><button class="route-btn" title="绘制" onclick="startDraw(routes[0])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[0])">🗑</button></div><div class="route-row" id="route-row-2"><div class="route-swatch" style="background:#2878c8"></div><span class="route-name">路线2</span><button class="route-btn" title="绘制" onclick="startDraw(routes[1])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[1])">🗑</button></div><div class="route-row" id="route-row-3"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线4</span><button class="route-btn" title="绘制" onclick="startDraw(routes[2])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[2])">🗑</button></div><div class="route-row" id="route-row-4"><div class="route-swatch" style="background:#28a040"></div><span class="route-name">路线5</span><button class="route-btn" title="绘制" onclick="startDraw(routes[3])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[3])">🗑</button></div><div class="route-row" id="route-row-5"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线6</span><button class="route-btn" title="绘制" onclick="startDraw(routes[4])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[4])">🗑</button></div><div class="route-row" id="route-row-6"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线7</span><button class="route-btn" title="绘制" onclick="startDraw(routes[5])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[5])">🗑</button></div><div class="route-row" id="route-row-7"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线8</span><button class="route-btn" title="绘制" onclick="startDraw(routes[6])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[6])">🗑</button></div><div class="route-row" id="route-row-8"><div class="route-swatch" style="background:#28a040"></div><span class="route-name">路线9</span><button class="route-btn" title="绘制" onclick="startDraw(routes[7])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[7])">🗑</button></div><div class="route-row" id="route-row-9"><div class="route-swatch" style="background:#8040c0"></div><span class="route-name">路线10</span><button class="route-btn" title="绘制" onclick="startDraw(routes[8])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[8])">🗑</button></div></div>
 
   <!-- 操作按钮 -->
   <div class="p-row">
     <button class="p-btn" onclick="addNewRoute()">➕ 新增路线</button>
-    <button class="p-btn" id="btn-lm" onclick="toggleLandmark()">📍 新建地标</button>
-  </div>
-
-  <!-- 画线进行中控制 -->
-  <div id="draw-ctrl">
-    <div class="label" id="draw-label">路线绘制中</div>
-    <div class="btns">
-      <button class="p-btn" id="btn-pause"  onclick="togglePause()">⏸ 暂停</button>
-      <button class="p-btn" onclick="undoPoint()">↩ 撤销</button>
-      <button class="p-btn" onclick="clearDrawing()">🗑 清除</button>
-      <button class="p-btn green" onclick="finishDraw()">✅ 完成</button>
-    </div>
+    <button class="p-btn" id="btn-lm" onclick="toggleLandmark()" style="">📍 新建地标</button>
   </div>
 
   <!-- 保存 -->
@@ -146,7 +136,18 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 
 </div>
 
-<div id="status-bar">太行灵山景区 · 白鹿泉 登山路线图</div>
+<!-- 画线控制条（底部浮动，画线时显示） -->
+<div id="draw-ctrl" style="display: none;">
+  <div class="label" id="draw-label" style="color: rgb(128, 64, 192);">路线10 绘制中</div>
+  <div class="btns">
+    <button class="p-btn" id="btn-pause" onclick="togglePause()">⏸ 暂停</button>
+    <button class="p-btn" onclick="undoPoint()">↩ 撤销</button>
+    <button class="p-btn" onclick="clearDrawing()">🗑 清除</button>
+    <button class="p-btn green" onclick="finishDraw()">✅ 完成</button>
+  </div>
+</div>
+
+<div id="status-bar" style="border-color: rgba(255, 255, 255, 0.18); background: rgba(10, 6, 2, 0.72);">地标「萌宠乐园遗址」已添加 · 可继续拖拽调整位置</div>
 
 <script>
 // ============================================================
@@ -268,7 +269,7 @@ function startDraw(r) {
   drawing = r;
   paused = false;
   map.getContainer().style.cursor = 'crosshair';
-  document.getElementById('draw-ctrl').style.display = '';
+  document.getElementById('draw-ctrl').style.display = 'block';
   document.getElementById('draw-label').textContent = r.name + ' 绘制中';
   document.getElementById('draw-label').style.color = r.color;
   document.getElementById('btn-pause').textContent = '⏸ 暂停';
@@ -349,7 +350,9 @@ map.on('dblclick', function(e) {
 // 新建地标
 // ============================================================
 var addingLandmark = false;
-var customMarkers  = [];
+var customMarkers = [
+  { name:'萌宠乐园遗址', latlng:[38.063597,114.264995], color:'#8040c0' }
+];
 
 function toggleLandmark() {
   addingLandmark = !addingLandmark;
@@ -428,14 +431,14 @@ function addPOI(latlng, name, color, isCustom) {
 // 默认景点
 var defaultPOIs = [
   { id:'最高处·亭子', latlng:[38.062520,114.259454], color:'#5c3d12' },
-  { id:'灵岩寺',      latlng:[38.065739,114.267415], color:'#b86018' },
-  { id:'素食餐厅',    latlng:[38.065963,114.268021], color:'#2d7828' },
-  { id:'小卖部',      latlng:[38.064881,114.266819], color:'#3d78a8' },
-  { id:'流量部',      latlng:[38.064932,114.267935], color:'#a04a18' },
-  { id:'融道学府',    latlng:[38.064277,114.266487], color:'#b86018' },
-  { id:'厕所',        latlng:[38.064778,114.267608], color:'#3d78a8' },
-  { id:'财富宝塔',    latlng:[38.065088,114.269646], color:'#b86018' },
-  { id:'八卦田',      latlng:[38.065916,114.271224], color:'#b86018' }
+  { id:'灵岩寺', latlng:[38.065739,114.267415], color:'#b86018' },
+  { id:'素食餐厅', latlng:[38.065963,114.268021], color:'#2d7828' },
+  { id:'小卖部', latlng:[38.064826,114.266720], color:'#3d78a8' },
+  { id:'流量部', latlng:[38.064902,114.267935], color:'#a04a18' },
+  { id:'融道学府', latlng:[38.064277,114.266487], color:'#b86018' },
+  { id:'厕所', latlng:[38.064778,114.267608], color:'#3d78a8' },
+  { id:'财富宝塔', latlng:[38.065088,114.269646], color:'#b86018' },
+  { id:'八卦田', latlng:[38.065916,114.271224], color:'#b86018' }
 ];
 
 (function loadMarkers() {
@@ -554,5 +557,6 @@ function exportFile() {
   a.click();
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
