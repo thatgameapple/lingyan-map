@@ -526,12 +526,6 @@ function renderLegend() {
   dotTypes.forEach(function(t){
     html += '<div class="row"><div class="l-dot" style="background:'+t.color+'"></div><span>'+t.label+'</span></div>';
   });
-  if (customMarkers.length > 0) {
-    html += '<div class="sec">自定义</div>';
-    customMarkers.forEach(function(m){
-      html += '<div class="row"><div class="l-dot" style="background:'+m.color+'"></div><span>'+m.name+'</span></div>';
-    });
-  }
   document.getElementById('legend').innerHTML = html;
 }
 
