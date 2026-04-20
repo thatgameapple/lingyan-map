@@ -569,18 +569,31 @@ function toggleShotMode(hide) {
 
 function exportHighRes() {
   toggleShotMode(true);
+  // 修复 Leaflet SVG transform，让 html2canvas 能识别
+  var fixed = [];
+  document.querySelectorAll('.leaflet-pane svg').forEach(function(svg) {
+    var t = svg.style.transform || '';
+    var m = t.match(/translate3d\((-?[\d.]+)px,\s*(-?[\d.]+)px/);
+    if (m) {
+      fixed.push({ el: svg, orig: t });
+      svg.style.transform = 'translate(' + m[1] + 'px,' + m[2] + 'px)';
+    }
+  });
   setTimeout(function() {
-    html2canvas(document.getElementById('map'), {
-      useCORS: true, scale: 2, logging: false, allowTaint: false
+    html2canvas(document.body, {
+      useCORS: true, scale: 2, logging: false, allowTaint: false,
+      width: window.innerWidth, height: window.innerHeight
     }).then(function(canvas) {
+      fixed.forEach(function(f){ f.el.style.transform = f.orig; });
       toggleShotMode(false);
       var link = document.createElement('a');
       link.download = '灵山登山路线图.png';
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
     }).catch(function() {
+      fixed.forEach(function(f){ f.el.style.transform = f.orig; });
       toggleShotMode(false);
-      alert('导出失败，请截图保存');
+      alert('导出失败，请手动截图');
     });
   }, 600);
 }
