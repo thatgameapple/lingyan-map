@@ -544,7 +544,7 @@ function renderLegend() {
 var shotMode = false;
 function toggleShotMode() {
   shotMode = !shotMode;
-  var hide = ['#panel','#legend','#status-bar','#draw-ctrl','.leaflet-control-zoom','.leaflet-control-attribution'];
+  var hide = ['#panel','#status-bar','#draw-ctrl','.leaflet-control-zoom','.leaflet-control-attribution'];
   hide.forEach(function(sel){
     document.querySelectorAll(sel).forEach(function(el){
       el.style.visibility = shotMode ? 'hidden' : '';
