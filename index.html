@@ -238,8 +238,8 @@ function renderLine(pts, existing, color) {
     map.removeLayer(existing);
   }
   if (!pts || pts.length < 2) return null;
-  var casing = L.polyline(pts, { color:'white', weight:10, opacity:0.55, lineJoin:'round', lineCap:'round' }).addTo(map);
-  var line   = L.polyline(pts, { color:color,   weight:6,  opacity:0.95, lineJoin:'round', lineCap:'round' }).addTo(map);
+  var casing = L.polyline(pts, { color:'white', weight:6, opacity:0.5, lineJoin:'round', lineCap:'round' }).addTo(map);
+  var line   = L.polyline(pts, { color:color,   weight:3.5, opacity:0.95, lineJoin:'round', lineCap:'round' }).addTo(map);
   line._casing = casing;
   return line;
 }
