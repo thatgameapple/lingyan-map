@@ -546,14 +546,12 @@ function renderLegend() {
 var shotMode = false;
 function toggleShotMode() {
   shotMode = !shotMode;
-  var hide = ['#panel','#status-bar','#draw-ctrl','.leaflet-control-zoom','.leaflet-control-attribution'];
+  var hide = ['#panel','#status-bar','#draw-ctrl','#shot-btn','#shot-tip','.leaflet-control-zoom','.leaflet-control-attribution'];
   hide.forEach(function(sel){
     document.querySelectorAll(sel).forEach(function(el){
       el.style.visibility = shotMode ? 'hidden' : '';
     });
   });
-  document.getElementById('shot-tip').style.display = shotMode ? 'block' : 'none';
-  document.getElementById('shot-btn').textContent = shotMode ? '✕ 退出截图' : '📷 截图模式';
 }
 document.addEventListener('keydown', function(e){
   if(e.key==='Escape' && shotMode) toggleShotMode();
