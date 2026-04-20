@@ -83,6 +83,26 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 #draw-ctrl .label { font-size:11px; color:rgba(255,255,255,0.75); margin-bottom:6px; text-align:center; }
 #draw-ctrl .btns  { display:flex; gap:7px; align-items:center; }
 
+/* 截图模式按钮 */
+#shot-btn {
+  position:absolute; top:18px; left:60px; z-index:1001;
+  background:rgba(10,6,2,0.70); color:white;
+  border:1px solid rgba(255,255,255,0.25);
+  padding:6px 12px; border-radius:4px; font-size:12px;
+  cursor:pointer; font-family:inherit; backdrop-filter:blur(4px);
+}
+#shot-btn:hover { background:rgba(50,30,5,0.88); }
+
+/* 截图模式提示 */
+#shot-tip {
+  display:none;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:1002; background:rgba(10,6,2,0.82); color:white;
+  padding:14px 28px; border-radius:8px; font-size:14px; text-align:center;
+  border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(6px);
+  pointer-events:none;
+}
+
 /* 状态栏 */
 #status-bar {
   position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
@@ -135,6 +155,10 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
   </div>
 
 </div>
+
+<!-- 截图模式按钮（始终显示） -->
+<button id="shot-btn" onclick="toggleShotMode()">📷 截图模式</button>
+<div id="shot-tip">地图已清洁 · 请使用 Command+Shift+4 截图<br><small style="opacity:0.6">按 ESC 退出截图模式</small></div>
 
 <!-- 画线控制条（底部浮动，画线时显示） -->
 <div id="draw-ctrl" style="display: none;">
@@ -514,6 +538,23 @@ function renderLegend() {
 // ============================================================
 // 状态栏
 // ============================================================
+// ============================================================
+// 截图模式
+// ============================================================
+var shotMode = false;
+function toggleShotMode() {
+  shotMode = !shotMode;
+  var hide = ['#panel','#legend','#status-bar','#draw-ctrl','.leaflet-control-zoom','.leaflet-control-attribution'];
+  hide.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.style.visibility = shotMode ? 'hidden' : '';
+    });
+  });
+  document.getElementById('shot-tip').style.display = shotMode ? 'block' : 'none';
+  document.getElementById('shot-btn').textContent = shotMode ? '✕ 退出截图' : '📷 截图模式';
+}
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && shotMode) toggleShotMode(); });
+
 function setStatus(text, color) {
   if (!isAdmin) return; // 非管理员不显示操作提示
   var el = document.getElementById('status-bar');
