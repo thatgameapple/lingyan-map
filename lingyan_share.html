@@ -114,7 +114,7 @@ ROUTES.forEach(function(r){
         +'<span class="rc-name">'+r.name+'</span>'
         +'<span class="rc-stars" style="color:'+r.color+'">'+r.difficulty+' <span class="rc-level">'+r.level+'</span></span>'
         +'<span class="rc-meta">'+r.dist+' · '+r.time+'</span>'
-        +(r.warn ? '<span class="rc-warn">'+r.warn+'</span>' : '')
+        +(r.warn ? '<span class="rc-warn" style="display:block">'+r.warn+'</span>' : '')
       +'</div>'
     +'</div>';
   });
@@ -340,7 +340,8 @@ function exportHighRes() {
                      ['#4a6fa5','停车场'],['#1d4ed8','学府'],['#6b7280','企业'],
                      ['#5c7a3e','亭子'],['#7c6f5e','遗址'],['#5c3d12','最高处']];
       var mainRoutes = ROUTES.filter(function(r){return !r.branch;});
-      var rows = mainRoutes.length*3 + poiCats.length + 3; // name+stars+meta rows per main route
+      var warnCount = mainRoutes.filter(function(r){return r.warn;}).length;
+      var rows = mainRoutes.length*3 + warnCount + poiCats.length + 3;
       var lRowH = 14*scale, lPad = 10*scale;
       var lW = 145*scale, lH = lPad*2 + rows*lRowH;
       var lX = 18*scale, lY = (H - 36)*scale - lH;
@@ -372,11 +373,12 @@ function exportHighRes() {
         // 距离 + 用时 + 警示
         ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.fillText(r.dist + ' · ' + r.time, lX+lPad+30*scale, ly2 + 9*scale);
+        ly2 += lRowH;
         if(r.warn) {
           ctx.fillStyle = '#ff9090';
-          ctx.fillText(r.warn, lX+lPad+30*scale + ctx.measureText(r.dist + ' · ' + r.time).width + 6*scale, ly2 + 9*scale);
+          ctx.fillText(r.warn, lX+lPad+30*scale, ly2 + 9*scale);
+          ly2 += lRowH;
         }
-        ly2 += lRowH;
       }
       function legendDot(color, name) {
         ctx.beginPath();
