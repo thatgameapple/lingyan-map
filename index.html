@@ -444,7 +444,9 @@ var POI_SVG = {
   '八卦田':       '<circle cx="10" cy="10" r="7" fill="none" stroke="white" stroke-width="1.2"/><line x1="10" y1="3" x2="10" y2="17" stroke="white" stroke-width="0.9"/><line x1="3" y1="10" x2="17" y2="10" stroke="white" stroke-width="0.9"/><line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="0.9"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="0.9"/>',
   '融道学府':     '<rect x="4" y="10" width="12" height="7" fill="none" stroke="white" stroke-width="1.3"/><path d="M2 10l8-6 8 6" fill="none" stroke="white" stroke-width="1.3"/><line x1="10" y1="4" x2="10" y2="2" stroke="white" stroke-width="1.2"/><rect x="7" y="13" width="6" height="4" fill="white"/>',
   '流量部':       '<rect x="5" y="7" width="10" height="10" fill="none" stroke="white" stroke-width="1.3"/><rect x="8" y="4" width="4" height="3" fill="none" stroke="white" stroke-width="1"/><rect x="7" y="10" width="2.5" height="2.5" fill="white"/><rect x="10.5" y="10" width="2.5" height="2.5" fill="white"/>',
-  '萌宠乐园遗址': '<circle cx="7" cy="6" r="2" fill="white"/><circle cx="13" cy="6" r="2" fill="white"/><path d="M5 11q5 7 10 0Q13 8 10 9Q7 8 5 11z" fill="white"/>'
+  '萌宠乐园遗址': '<circle cx="7" cy="6" r="2" fill="white"/><circle cx="13" cy="6" r="2" fill="white"/><path d="M5 11q5 7 10 0Q13 8 10 9Q7 8 5 11z" fill="white"/>',
+  '停车场①':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
+  '停车场②':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>'
 };
 
 function poiIcon(name, color) {
@@ -484,7 +486,9 @@ var defaultPOIs = [
   { id:'融道学府', latlng:[38.064277,114.266487], color:'#b86018' },
   { id:'厕所', latlng:[38.064778,114.267608], color:'#3d78a8' },
   { id:'财富宝塔', latlng:[38.065088,114.269646], color:'#b86018' },
-  { id:'八卦田', latlng:[38.065916,114.271224], color:'#b86018' }
+  { id:'八卦田',    latlng:[38.065916,114.271224], color:'#b86018' },
+  { id:'停车场①', latlng:[38.065600,114.268100], color:'#4a6fa5' },
+  { id:'停车场②', latlng:[38.064500,114.266200], color:'#4a6fa5' }
 ];
 
 (function loadMarkers() {
