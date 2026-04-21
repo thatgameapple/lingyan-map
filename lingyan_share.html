@@ -175,23 +175,84 @@ POIS.forEach(function(p){
 // 导出高清图
 // ============================================================
 function exportHighRes() {
-  var skipIds = new Set(['shot-btn','legend','title-box']);
+  var scale = 2;
+  var W = window.innerWidth, H = window.innerHeight;
+
+  // 隐藏 Leaflet 覆盖层（路线、标注），只让 html2canvas 捕获卫星底图
+  var overlayPane  = document.querySelector('.leaflet-overlay-pane');
+  var markerPane   = document.querySelector('.leaflet-marker-pane');
+  var shadowPane   = document.querySelector('.leaflet-shadow-pane');
+  [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display='none'; });
+
   setTimeout(function(){
-    html2canvas(document.body,{
-      useCORS:true, scale:2, logging:false, allowTaint:false,
-      width:window.innerWidth, height:window.innerHeight,
+    html2canvas(document.body, {
+      useCORS:true, scale:scale, logging:false, allowTaint:false,
+      width:W, height:H,
       ignoreElements:function(el){
-        if(skipIds.has(el.id)) return true;
+        if(['shot-btn','legend','title-box'].indexOf(el.id) >= 0) return true;
         if(el.classList && el.classList.contains('leaflet-control-container')) return true;
         return false;
       }
     }).then(function(canvas){
-      var link=document.createElement('a');
-      link.download='灵山登山路线图.png';
-      link.href=canvas.toDataURL('image/png',1.0);
+      [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display=''; });
+      var ctx = canvas.getContext('2d');
+
+      // ---- 绘制路线 ----
+      ROUTES.forEach(function(r){
+        var pts = r.pts.map(function(ll){ return map.latLngToContainerPoint(ll); });
+        // 白色描边
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+        ctx.lineWidth = 5.5 * scale;
+        ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p.x*scale,p.y*scale) : ctx.lineTo(p.x*scale,p.y*scale); });
+        ctx.stroke();
+        // 彩色路线
+        ctx.beginPath();
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 3 * scale;
+        ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p.x*scale,p.y*scale) : ctx.lineTo(p.x*scale,p.y*scale); });
+        ctx.stroke();
+      });
+
+      // ---- 绘制 POI 标注 ----
+      var R = 9 * scale;
+      ctx.font = 'bold ' + (9.5*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.textAlign = 'center';
+      POIS.forEach(function(p){
+        var pt = map.latLngToContainerPoint(p.latlng);
+        var cx = pt.x * scale, cy = pt.y * scale;
+        // 圆形背景
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 2 * scale;
+        ctx.stroke();
+        // 标签背景
+        var label = p.id;
+        var tw = ctx.measureText(label).width;
+        var lh = 10 * scale, lpad = 4 * scale;
+        var lx = cx - tw/2 - lpad, ly = cy + R + 2*scale;
+        ctx.fillStyle = 'rgba(0,0,0,0.72)';
+        ctx.beginPath();
+        ctx.roundRect(lx, ly, tw + lpad*2, lh + 2*scale, 2*scale);
+        ctx.fill();
+        // 标签文字
+        ctx.fillStyle = 'white';
+        ctx.fillText(label, cx, ly + lh - 1*scale);
+      });
+
+      var link = document.createElement('a');
+      link.download = '灵山登山路线图.png';
+      link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
+    }).catch(function(){
+      [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display=''; });
     });
-  },600);
+  }, 600);
 }
 </script>
 </body></html>
