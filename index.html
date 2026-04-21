@@ -1,11 +1,12 @@
+<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
-<title>灵山景区登山路线 · 卫星图</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>灵山景区登山路线图</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-* { box-sizing: border-box; }
+* { box-sizing:border-box; }
 body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif; }
 #map { width:100vw; height:100vh; }
 
@@ -19,7 +20,7 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 #title-box p  { margin:3px 0 0; font-size:9.5px; opacity:0.72; letter-spacing:2.5px; }
 
 #legend {
-  position:absolute; bottom:52px; left:18px; z-index:1000;
+  position:absolute; bottom:36px; left:18px; z-index:1000;
   background:rgba(10,6,2,0.68); color:white; padding:10px 14px; border-radius:6px;
   font-size:11px; line-height:1.5; border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(4px);
   min-width:130px;
@@ -28,658 +29,433 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 #legend .row { display:flex; align-items:center; gap:7px; margin:3px 0; }
 .l-line { width:24px; height:4px; border-radius:2px; flex-shrink:0; }
 .l-dot  { width:10px; height:10px; border-radius:50%; border:2px solid white; flex-shrink:0; }
+.route-card { display:flex; align-items:center; gap:8px; margin:4px 0; }
+.rc-line { width:24px; height:5px; border-radius:3px; flex-shrink:0; }
+.rc-info { display:flex; flex-direction:column; gap:1px; }
+.rc-name { font-size:11px; font-weight:700; color:white; }
+.rc-stars { font-size:10px; letter-spacing:1px; }
+.rc-level { font-size:9px; opacity:0.6; letter-spacing:0; }
+.rc-meta  { font-size:9px; opacity:0.55; }
+.rc-warn  { font-size:9px; color:#ff9090; }
 
-/* 右侧控制面板 */
-#panel {
-  position:absolute; top:14px; right:14px; z-index:1000;
-  display:flex; flex-direction:column; gap:5px; align-items:flex-end;
-  max-width:220px;
-}
-.p-row { display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; }
-.p-btn {
-  background:rgba(10,6,2,0.70); color:white;
-  border:1px solid rgba(255,255,255,0.25);
-  padding:5px 11px; border-radius:4px; font-size:11px;
-  cursor:pointer; font-family:inherit; backdrop-filter:blur(4px);
-  white-space:nowrap; line-height:1.4;
-}
-.p-btn:hover { background:rgba(50,30,5,0.88); }
-.p-btn.active-layer { background:rgba(160,90,15,0.88); border-color:#d8a040; }
-.p-btn.active-draw  { border-width:2px; }
-.p-btn.green  { background:rgba(15,70,15,0.85); border-color:#50b050; }
-.p-btn.green:hover { background:rgba(20,90,20,0.92); }
-.p-btn.paused { background:rgba(15,60,15,0.85); border-color:#50b050; }
-
-/* 颜色选择器 */
-#color-bar { display:flex; gap:5px; align-items:center; }
-.c-dot {
-  width:18px; height:18px; border-radius:50%;
-  cursor:pointer; border:2px solid rgba(255,255,255,0.35);
-  flex-shrink:0; transition:transform 0.1s;
-}
-.c-dot:hover   { transform:scale(1.2); }
-.c-dot.selected { border:2.5px solid white; transform:scale(1.18); }
-
-/* 路线列表 */
-#route-list { display:flex; flex-direction:column; gap:4px; width:100%; }
-.route-row {
-  display:flex; align-items:center; gap:5px;
-  background:rgba(10,6,2,0.65); border:1px solid rgba(255,255,255,0.15);
-  border-radius:4px; padding:4px 7px; backdrop-filter:blur(4px);
-}
-.route-swatch { width:22px; height:4px; border-radius:2px; flex-shrink:0; }
-.route-name   { flex:1; color:white; font-size:11px; }
-.route-btn    { background:none; border:none; color:rgba(255,255,255,0.75); cursor:pointer; font-size:12px; padding:1px 3px; }
-.route-btn:hover { color:white; }
-
-/* 画线进行中的控制条 - 底部浮动 */
-#draw-ctrl {
-  display:none;
-  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
-  z-index:1001;
-  background:rgba(10,6,2,0.88); border:1px solid rgba(255,255,255,0.3);
-  border-radius:8px; padding:8px 14px; backdrop-filter:blur(6px);
-  white-space:nowrap;
-}
-#draw-ctrl .label { font-size:11px; color:rgba(255,255,255,0.75); margin-bottom:6px; text-align:center; }
-#draw-ctrl .btns  { display:flex; gap:7px; align-items:center; }
-
-/* 截图模式按钮 */
 #shot-btn {
-  position:absolute; top:18px; left:60px; z-index:1001;
+  position:absolute; top:18px; left:18px; z-index:1001;
   background:rgba(10,6,2,0.70); color:white;
   border:1px solid rgba(255,255,255,0.25);
   padding:6px 12px; border-radius:4px; font-size:12px;
   cursor:pointer; font-family:inherit; backdrop-filter:blur(4px);
 }
 #shot-btn:hover { background:rgba(50,30,5,0.88); }
-
-/* 截图模式提示 */
-#shot-tip {
-  display:none;
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  z-index:1002; background:rgba(10,6,2,0.82); color:white;
-  padding:14px 28px; border-radius:8px; font-size:14px; text-align:center;
-  border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(6px);
-  pointer-events:none;
-}
-
-#status-bar { display:none; }
 </style>
 </head>
-<body class="">
+<body>
 
-<div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative; outline-style: none;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(7795px, -1234px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 19; transform: translate3d(-3643px, 852px, 0px) scale(1);"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107139" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3405px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107138" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3661px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107140" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3149px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107137" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-3917px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107141" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2893px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50528/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 600px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50527/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 344px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50529/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 856px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50526/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 88px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107136" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-4173px, 1112px, 0px); opacity: 1;"><img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/17/50530/107142" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-2637px, 1112px, 0px); opacity: 1;"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, -2px, 0px) scale(2);"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="1814" height="967" viewBox="-7946 1153 1814 967" style="transform: translate3d(-7946px, 1153px, 0px);"><g><path class="leaflet-interactive" stroke="#e07020" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-6480 1362L-6487 1386L-6500 1412L-6516 1436L-6533 1472L-6555 1510L-6559 1512L-6572 1510L-6582 1503L-6615 1471L-6633 1464L-6650 1454L-6676 1431L-6706 1424L-6732 1420L-6782 1438L-6791 1443L-6858 1469L-6879 1475L-6912 1489L-6954 1514L-7012 1543L-7028 1549L-7092 1566L-7192 1607L-7301 1640L-7343 1650L-7356 1656L-7369 1659L-7390 1670L-7402 1684L-7423 1693L-7434 1696L-7456 1717L-7486 1738L-7502 1746L-7511 1750L-7516 1746L-7556 1746L-7575 1751L-7605 1771L-7614 1775L-7623 1794L-7629 1803L-7636 1810L-7643 1797L-7657 1796"></path><path class="leaflet-interactive" stroke="#2878c8" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-6890 1482L-6885 1489L-6877 1487L-6860 1479L-6839 1475L-6810 1489L-6787 1498L-6783 1504L-6782 1509L-6786 1522L-6795 1541L-6804 1555L-6838 1580L-6919 1603L-6949 1633L-6997 1674L-7003 1681L-7006 1689L-7010 1693L-7027 1700L-7052 1706L-7072 1714L-7090 1730L-7100 1743L-7110 1745L-7127 1755L-7132 1767L-7152 1774L-7167 1775L-7183 1780L-7208 1815L-7226 1823L-7251 1831L-7264 1839L-7280 1854L-7284 1855L-7301 1853L-7310 1850L-7323 1850L-7344 1854L-7363 1854L-7379 1856L-7415 1868L-7443 1880L-7457 1888L-7463 1893L-7464 1897L-7475 1915L-7479 1918L-7504 1922L-7519 1930L-7529 1933L-7549 1927L-7566 1924L-7572 1890L-7568 1881L-7562 1878L-7562 1832L-7560 1812L-7557 1799L-7550 1785L-7538 1773L-7535 1766L-7530 1760L-7525 1756L-7512 1750"></path><path class="leaflet-interactive" stroke="#28a040" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-7562 1877L-7560 1878L-7557 1874L-7551 1862L-7535 1860L-7531 1835L-7520 1820L-7503 1813L-7494 1821L-7481 1818L-7473 1814L-7459 1800L-7449 1795L-7443 1788L-7428 1776L-7405 1762L-7388 1756L-7380 1750L-7371 1747L-7364 1747L-7351 1742L-7337 1732L-7303 1723L-7284 1703L-7265 1696L-7255 1686L-7224 1669L-7187 1655L-7131 1620L-7120 1610L-7080 1563"></path><path class="leaflet-interactive" stroke="#8040c0" stroke-opacity="0.92" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M-7012 1693L-7022 1695L-7063 1690L-7075 1693L-7118 1710L-7134 1734L-7143 1739L-7153 1740L-7163 1735L-7183 1729L-7215 1732L-7220 1736L-7228 1747L-7234 1750L-7241 1750L-7247 1747L-7251 1748L-7261 1760L-7290 1757L-7303 1770L-7322 1771L-7347 1782L-7356 1784L-7359 1790L-7368 1793L-7379 1791L-7400 1801L-7441 1809L-7445 1808L-7449 1801L-7450 1795"></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7663px, 1792px, 0px); z-index: 2292;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#5c3d12;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#5c3d12;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">最高处·亭子</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6921px, 1411px, 0px); z-index: 1911;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">灵岩寺</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6864px, 1384px, 0px); z-index: 1884;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#2d7828;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#2d7828;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">素食餐厅</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6986px, 1519px, 0px); z-index: 2019;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#3d78a8;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#3d78a8;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;" class="">小卖部</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6872px, 1510px, 0px); z-index: 2010;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#a04a18;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#a04a18;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;" class="">流量部</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7007px, 1584px, 0px); z-index: 2084;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">融道学府</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6903px, 1525px, 0px); z-index: 2025;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#3d78a8;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#3d78a8;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">厕所</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6713px, 1488px, 0px); z-index: 1988;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">财富宝塔</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-6566px, 1390px, 0px); z-index: 1890;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#b86018;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#b86018;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">八卦田</div></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive leaflet-marker-draggable" tabindex="0" role="button" style="margin-left: -7px; margin-top: -8px; transform: translate3d(-7146px, 1665px, 0px); z-index: 2165;"><div style="display:flex;align-items:center;gap:5px;cursor:grab;"><div style="width:13px;height:13px;border-radius:50%;background:#8040c0;border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.6);flex-shrink:0;"></div><div style="background:#8040c0;color:white;font-size:11.5px;font-weight:bold;padding:3px 9px;border-radius:4px;white-space:nowrap;border:1.5px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.55);letter-spacing:0.5px;">萌宠乐园遗址</div></div></div></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(2.74276e+07px, 1.29354e+07px, 0px) scale(65536);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> Tiles © Esri</div></div></div></div>
+<div id="map"></div>
 
 <div id="title-box">
   <h2>登山路线图</h2>
   <p>太行灵山景区 · 白鹿泉</p>
 </div>
 
-<!-- 图例（动态生成） -->
-<div id="legend"><div class="sec">路线</div><div class="row"><div class="l-line" style="background:#e07020"></div><span>路线1</span></div><div class="row"><div class="l-line" style="background:#2878c8"></div><span>路线2</span></div><div class="row"><div class="l-line" style="background:#28a040"></div><span>路线9</span></div><div class="row"><div class="l-line" style="background:#8040c0"></div><span>路线10</span></div><div class="sec">标注</div><div class="row"><div class="l-dot" style="background:#b86018"></div><span>景点</span></div><div class="row"><div class="l-dot" style="background:#3d78a8"></div><span>设施</span></div><div class="row"><div class="l-dot" style="background:#2d7828"></div><span>餐饮</span></div><div class="row"><div class="l-dot" style="background:#5c3d12"></div><span>最高处</span></div><div class="sec">自定义</div><div class="row"><div class="l-dot" style="background:#8040c0"></div><span>萌宠乐园遗址</span></div></div>
+<div id="legend"></div>
 
-<!-- 右侧控制面板（管理员模式 ?admin 才显示） -->
-<div id="panel" style="display:none">
-
-  <!-- 底图切换 -->
-  <div class="p-row">
-    <button class="p-btn active-layer" id="btn-sat" onclick="switchLayer('sat')">卫星图</button>
-    <button class="p-btn" id="btn-osm" onclick="switchLayer('osm')">街道图</button>
-  </div>
-
-  <!-- 颜色选择 -->
-  <div class="p-row" style="background:rgba(10,6,2,0.65);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:5px 8px;backdrop-filter:blur(4px);">
-    <span style="font-size:10px;color:rgba(255,255,255,0.6);margin-right:2px;">颜色</span>
-    <div id="color-bar"><div class="c-dot" title="#e07020" style="background: rgb(224, 112, 32);"></div><div class="c-dot" title="#2878c8" style="background: rgb(40, 120, 200);"></div><div class="c-dot" title="#d03030" style="background: rgb(208, 48, 48);"></div><div class="c-dot" title="#28a040" style="background: rgb(40, 160, 64);"></div><div class="c-dot selected" title="#8040c0" style="background: rgb(128, 64, 192);"></div><div class="c-dot" title="#c8a020" style="background: rgb(200, 160, 32);"></div><div class="c-dot" title="#c83060" style="background: rgb(200, 48, 96);"></div><div class="c-dot" title="#2090a8" style="background: rgb(32, 144, 168);"></div><div class="c-dot" title="#7a5020" style="background: rgb(122, 80, 32);"></div></div>
-  </div>
-
-  <!-- 路线列表 -->
-  <div id="route-list"><div class="route-row" id="route-row-1"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线1</span><button class="route-btn" title="绘制" onclick="startDraw(routes[0])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[0])">🗑</button></div><div class="route-row" id="route-row-2"><div class="route-swatch" style="background:#2878c8"></div><span class="route-name">路线2</span><button class="route-btn" title="绘制" onclick="startDraw(routes[1])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[1])">🗑</button></div><div class="route-row" id="route-row-3"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线4</span><button class="route-btn" title="绘制" onclick="startDraw(routes[2])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[2])">🗑</button></div><div class="route-row" id="route-row-4"><div class="route-swatch" style="background:#28a040"></div><span class="route-name">路线5</span><button class="route-btn" title="绘制" onclick="startDraw(routes[3])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[3])">🗑</button></div><div class="route-row" id="route-row-5"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线6</span><button class="route-btn" title="绘制" onclick="startDraw(routes[4])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[4])">🗑</button></div><div class="route-row" id="route-row-6"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线7</span><button class="route-btn" title="绘制" onclick="startDraw(routes[5])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[5])">🗑</button></div><div class="route-row" id="route-row-7"><div class="route-swatch" style="background:#e07020"></div><span class="route-name">路线8</span><button class="route-btn" title="绘制" onclick="startDraw(routes[6])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[6])">🗑</button></div><div class="route-row" id="route-row-8"><div class="route-swatch" style="background:#28a040"></div><span class="route-name">路线9</span><button class="route-btn" title="绘制" onclick="startDraw(routes[7])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[7])">🗑</button></div><div class="route-row" id="route-row-9"><div class="route-swatch" style="background:#8040c0"></div><span class="route-name">路线10</span><button class="route-btn" title="绘制" onclick="startDraw(routes[8])">✏️</button><button class="route-btn" title="清除路线" onclick="clearRoute(routes[8])">🗑</button></div></div>
-
-  <!-- 操作按钮 -->
-  <div class="p-row">
-    <button class="p-btn" onclick="addNewRoute()">➕ 新增路线</button>
-    <button class="p-btn" id="btn-lm" onclick="toggleLandmark()" style="">📍 新建地标</button>
-  </div>
-
-  <!-- 保存 -->
-  <div class="p-row">
-    <button class="p-btn green" onclick="exportFile()">💾 保存文件</button>
-  </div>
-
-</div>
-
-<!-- 截图模式按钮（始终显示） -->
 <button id="shot-btn" onclick="exportHighRes()">📷 导出高清图</button>
-<div id="shot-tip">地图已清洁 · 请使用 Command+Shift+4 截图<br><small style="opacity:0.6">按 ESC 退出截图模式</small></div>
-
-<!-- 画线控制条（底部浮动，画线时显示） -->
-<div id="draw-ctrl" style="display: none;">
-  <div class="label" id="draw-label" style="color: rgb(128, 64, 192);">路线10 绘制中</div>
-  <div class="btns">
-    <button class="p-btn" id="btn-pause" onclick="togglePause()">⏸ 暂停</button>
-    <button class="p-btn" onclick="undoPoint()">↩ 撤销</button>
-    <button class="p-btn" onclick="clearDrawing()">🗑 清除</button>
-    <button class="p-btn green" onclick="finishDraw()">✅ 完成</button>
-  </div>
-</div>
-
-<div id="status-bar" style="border-color: rgba(255, 255, 255, 0.18); background: rgba(10, 6, 2, 0.72);">地标「萌宠乐园遗址」已添加 · 可继续拖拽调整位置</div>
 
 <script>
 // ============================================================
 // 地图初始化
 // ============================================================
-// 管理员模式：URL 含 ?admin 才能编辑
-var isAdmin = location.search.includes('admin');
-if (isAdmin) {
-  document.getElementById('panel').style.display = 'flex';
-}
-
-var canvasRenderer = L.canvas({ padding: 0.5 });
 var map = L.map('map', {
-  center: [38.0600, 114.2580], zoom: 16,
-  zoomControl: true, doubleClickZoom: false
+  center:[38.0630, 114.2645], zoom:16,
+  zoomControl:true, doubleClickZoom:false
 });
-var satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Tiles © Esri', maxZoom:19 });
-var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 });
-satLayer.addTo(map);
-
-function switchLayer(t) {
-  if (t === 'sat') { map.removeLayer(osmLayer); satLayer.addTo(map); }
-  else             { map.removeLayer(satLayer); osmLayer.addTo(map); }
-  document.getElementById('btn-sat').className = 'p-btn' + (t==='sat' ? ' active-layer' : '');
-  document.getElementById('btn-osm').className = 'p-btn' + (t==='osm' ? ' active-layer' : '');
-}
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution:'Tiles © Esri', maxZoom:19, crossOrigin:'anonymous'
+}).addTo(map);
 
 // ============================================================
-// 颜色面板
+// 路线坐标（从卫星图 DOM 像素坐标反算，以灵岩寺为基准校正）
+// 基准：像素(-6921, 1411) = (38.065739°N, 114.267415°E)
 // ============================================================
-var PALETTE = ['#e07020','#2878c8','#d03030','#28a040','#8040c0','#c8a020','#c83060','#2090a8','#7a5020'];
-var selectedColor = PALETTE[0];
+var REF_X=-6921, REF_Y=1411, REF_LAT=38.065739, REF_LNG=114.267415;
+var LNG_PX=1/93207, LAT_PX=-1/118328;
+function px(sx,sy){ return [REF_LAT+(sy-REF_Y)*LAT_PX, REF_LNG+(sx-REF_X)*LNG_PX]; }
+function cvt(a){ return a.map(function(p){return px(p[0],p[1]);}); }
 
-(function buildColorBar() {
-  var bar = document.getElementById('color-bar');
-  PALETTE.forEach(function(c) {
-    var d = document.createElement('div');
-    d.className = 'c-dot' + (c === selectedColor ? ' selected' : '');
-    d.style.background = c;
-    d.title = c;
-    d.onclick = function() {
-      selectedColor = c;
-      document.querySelectorAll('.c-dot').forEach(function(x){ x.classList.remove('selected'); });
-      d.classList.add('selected');
-    };
-    bar.appendChild(d);
+var ROUTES = [
+  { name:'经典路线', color:'#3ab54a', difficulty:'★★☆☆', level:'轻松', dist:'1.4km', time:'约30分钟', warn:'', branch:false, pts:[[38.066153,114.272149],[38.065954,114.272071],[38.065730,114.271929],[38.065525,114.271760],[38.065226,114.271575],[38.065035,114.271435],[38.064905,114.271342],[38.064886,114.271301],[38.064907,114.271154],[38.064964,114.271049],[38.065044,114.270931],[38.065228,114.270698],[38.065289,114.270505],[38.065380,114.270322],[38.065508,114.270137],[38.065568,114.270038],[38.065597,114.269909],[38.065629,114.269724],[38.065646,114.269606],[38.065665,114.269440],[38.065620,114.269292],[38.065578,114.269137],[38.065506,114.268906],[38.065468,114.268807],[38.065386,114.268523],[38.065344,114.268386],[38.065249,114.268091],[38.065194,114.267863],[38.065147,114.267726],[38.065116,114.267613],[38.065078,114.267506],[38.065042,114.267423],[38.064945,114.267206],[38.064873,114.267055],[38.064812,114.266919],[38.064733,114.266720],[38.064666,114.266565],[38.064622,114.266433],[38.064571,114.266270],[38.064520,114.266001],[38.064503,114.265918],[38.064480,114.265803],[38.064427,114.265575],[38.064396,114.265470],[38.064347,114.265296],[38.064250,114.265020],[38.064191,114.264867],[38.064134,114.264674],[38.064085,114.264505],[38.064009,114.264207],[38.063954,114.263960],[38.063923,114.263797],[38.063880,114.263625],[38.063832,114.263434],[38.063802,114.263338],[38.063775,114.263164],[38.063737,114.263016],[38.063718,114.262887],[38.063673,114.262745],[38.063642,114.262608],[38.063602,114.262493],[38.063549,114.262380],[38.063431,114.262257],[38.063397,114.262168],[38.063359,114.262024],[38.063329,114.261911],[38.063221,114.261763],[38.063158,114.261675],[38.063093,114.261560],[38.062981,114.261350],[38.062943,114.261265],[38.062911,114.261176],[38.062879,114.261082],[38.062907,114.261034],[38.062907,114.260902],[38.062909,114.260704],[38.062907,114.260605],[38.062903,114.260543],[38.062886,114.260460],[38.062865,114.260398],[38.062829,114.260320],[38.062757,114.260170],[38.062700,114.260071],[38.062666,114.259982],[38.062603,114.259931],[38.062508,114.259878],[38.062453,114.259856],[38.062406,114.259819],[38.062370,114.259792],[38.062332,114.259779],[38.062307,114.259771],[38.062296,114.259757],[38.062318,114.259741],[38.062356,114.259733],[38.062400,114.259720],[38.062427,114.259712],[38.062465,114.259706],[38.062503,114.259698],[38.062533,114.259687],[38.062554,114.259674],[38.062529,114.259639],[38.062514,114.259615],[38.062508,114.259602],[38.062520,114.259585],[38.062541,114.259572],[38.062571,114.259556],[38.062567,114.259505],[38.062567,114.259484]] },
+  { name:'财富路线', color:'#d4a020', difficulty:'★★★☆', level:'普通', dist:'1.2km', time:'约28分钟', warn:'', branch:false, pts:[[38.065141,114.267745],[38.065103,114.267777],[38.065084,114.267804],[38.065099,114.267890],[38.065162,114.268064],[38.065192,114.268201],[38.065202,114.268292],[38.065082,114.268600],[38.065006,114.268850],[38.064953,114.268898],[38.064909,114.268903],[38.064805,114.268861],[38.064714,114.268812],[38.064638,114.268764],[38.064527,114.268667],[38.064467,114.268582],[38.064398,114.268461],[38.064309,114.268300],[38.064271,114.268128],[38.064229,114.267949],[38.064201,114.267820],[38.064151,114.267613],[38.064127,114.267514],[38.064113,114.267439],[38.064073,114.267372],[38.064037,114.267321],[38.063950,114.267211],[38.063863,114.267109],[38.063781,114.266994],[38.063654,114.266795],[38.063566,114.266677],[38.063515,114.266602],[38.063460,114.266532],[38.063393,114.266500],[38.063361,114.266460],[38.063329,114.266382],[38.063302,114.266272],[38.063274,114.266143],[38.063257,114.266076],[38.063245,114.266009],[38.063205,114.265854],[38.063177,114.265789],[38.063141,114.265736],[38.063099,114.265679],[38.063046,114.265604],[38.062979,114.265543],[38.062934,114.265497],[38.062917,114.265384],[38.062886,114.265309],[38.062835,114.265202],[38.062784,114.265178],[38.062753,114.265159],[38.062729,114.265146],[38.062708,114.265084],[38.062689,114.264982],[38.062675,114.264939],[38.062668,114.264848],[38.062662,114.264770],[38.062643,114.264687],[38.062620,114.264604],[38.062533,114.264513],[38.062430,114.264419],[38.062330,114.264336],[38.062303,114.264285],[38.062273,114.264199],[38.062256,114.264137],[38.062248,114.264081],[38.062191,114.263877],[38.062161,114.263794],[38.062128,114.263732],[38.062085,114.263678],[38.062030,114.263609],[38.061997,114.263560],[38.061986,114.263523],[38.061995,114.263440],[38.062009,114.263338],[38.062028,114.263244],[38.062030,114.263169],[38.062028,114.263099],[38.062005,114.262954],[38.062001,114.262879],[38.061999,114.262791],[38.061999,114.262675],[38.061986,114.262584],[38.061978,114.262498],[38.061927,114.262281],[38.061874,114.262112],[38.061836,114.261994],[38.061809,114.261932],[38.061781,114.261814],[38.061739,114.261712],[38.061707,114.261659],[38.061665,114.261602],[38.061635,114.261586],[38.061524,114.261506],[38.061481,114.261471],[38.061458,114.261431],[38.061443,114.261361],[38.061433,114.261224],[38.061420,114.261157],[38.061376,114.261053],[38.061353,114.261002],[38.061336,114.260945],[38.061327,114.260889],[38.061346,114.260825],[38.061382,114.260677],[38.061405,114.260497],[38.061462,114.260468],[38.061574,114.260446],[38.061695,114.260433],[38.061766,114.260471],[38.061794,114.260532],[38.061853,114.260548],[38.061971,114.260551],[38.062102,114.260543],[38.062180,114.260532],[38.062261,114.260546],[38.062349,114.260562],[38.062463,114.260586],[38.062582,114.260661],[38.062637,114.260733],[38.062683,114.260795],[38.062740,114.260827],[38.062791,114.260884],[38.062827,114.260932],[38.062850,114.260996],[38.062877,114.261074]] },
+  { name:'支线3', color:'#aaaaaa', difficulty:'', level:'', dist:'', time:'', warn:'', branch:true, pts:[[38.061800,114.260535],[38.061798,114.260554],[38.061830,114.260594],[38.061927,114.260656],[38.061935,114.260758],[38.061942,114.260825],[38.062085,114.260851],[38.062161,114.260873],[38.062229,114.260927],[38.062282,114.260983],[38.062305,114.261061],[38.062328,114.261128],[38.062345,114.261173],[38.062313,114.261214],[38.062277,114.261262],[38.062277,114.261307],[38.062305,114.261401],[38.062337,114.261490],[38.062387,114.261549],[38.062455,114.261645],[38.062495,114.261745],[38.062556,114.261814],[38.062658,114.261975],[38.062713,114.262093],[38.062774,114.262222],[38.062797,114.262316],[38.062822,114.262402],[38.062875,114.262493],[38.062900,114.262587],[38.062905,114.262657],[38.062945,114.262801],[38.062987,114.262868],[38.063025,114.262946],[38.063038,114.263027],[38.063074,114.263204],[38.063105,114.263316],[38.063173,114.263400],[38.063243,114.263472],[38.063272,114.263523],[38.063287,114.263590],[38.063333,114.263719],[38.063414,114.263831],[38.063477,114.263957],[38.063519,114.264054],[38.063557,114.264159],[38.063593,114.264277],[38.063637,114.264432],[38.063678,114.264558],[38.063726,114.264641],[38.063768,114.264749],[38.063809,114.264824],[38.063857,114.264899],[38.063912,114.265030],[38.063971,114.265159],[38.064056,114.265282],[38.064117,114.265339],[38.064203,114.265427],[38.064265,114.265508],[38.064309,114.265553],[38.064358,114.265604],[38.064393,114.265647],[38.064438,114.265685],[38.064451,114.265704]] },
+  { name:'支线4', color:'#aaaaaa', difficulty:'', level:'', dist:'', time:'', warn:'', branch:true, pts:[[38.063357,114.266433],[38.063344,114.266326],[38.063357,114.266133],[38.063369,114.265988],[38.063378,114.265891],[38.063361,114.265763],[38.063297,114.265553],[38.063259,114.265446],[38.063238,114.265355],[38.063213,114.265301],[38.063141,114.265231],[38.063065,114.265183],[38.063010,114.265124],[38.062968,114.265033],[38.062960,114.264926],[38.062998,114.264813],[38.063036,114.264700],[38.063053,114.264604],[38.063040,114.264454],[38.063036,114.264352],[38.063031,114.264261],[38.062993,114.264207],[38.062905,114.264121],[38.062879,114.264057],[38.062879,114.263982],[38.062900,114.263917],[38.062888,114.263869],[38.062841,114.263815],[38.062791,114.263767],[38.062795,114.263713],[38.062812,114.263579],[38.062816,114.263456],[38.062748,114.263375],[38.062706,114.263311],[38.062702,114.263214],[38.062702,114.263107],[38.062677,114.263021],[38.062643,114.262941],[38.062609,114.262844],[38.062588,114.262748],[38.062541,114.262710],[38.062516,114.262619],[38.062533,114.262501],[38.062482,114.262356],[38.062453,114.262311],[38.062446,114.262270],[38.062436,114.262185],[38.062430,114.262112],[38.062421,114.262056],[38.062396,114.261957],[38.062381,114.261889],[38.062379,114.261838],[38.062389,114.261788],[38.062444,114.261747],[38.062495,114.261737]] },
+  { name:'支线5', color:'#aaaaaa', difficulty:'', level:'', dist:'', time:'', warn:'', branch:true, pts:[[38.061777,114.260465],[38.061764,114.260420],[38.061773,114.260401],[38.061798,114.260406],[38.061823,114.260436],[38.061847,114.260436],[38.061878,114.260425],[38.061921,114.260377],[38.061956,114.260353],[38.061988,114.260318],[38.062020,114.260285],[38.062056,114.260253],[38.062100,114.260224],[38.062125,114.260184],[38.062157,114.260146],[38.062185,114.260100],[38.062204,114.260060],[38.062237,114.260044],[38.062273,114.260052],[38.062299,114.260033],[38.062309,114.259985],[38.062316,114.259948],[38.062318,114.259921],[38.062301,114.259899],[38.062269,114.259883],[38.062269,114.259851],[38.062277,114.259824],[38.062286,114.259803],[38.062288,114.259771],[38.062296,114.259760]] },
+  { name:'断壁探险', color:'#cc2020', difficulty:'★★★★', level:'挑战', dist:'0.2km', time:'约17分钟', warn:'⚠ 需有户外经验', branch:false, pts:[[38.061933,114.263558],[38.061887,114.263582],[38.061832,114.263577],[38.061785,114.263555],[38.061722,114.263531],[38.061674,114.263518],[38.061621,114.263499],[38.061587,114.263493],[38.061551,114.263504],[38.061481,114.263531],[38.061410,114.263558],[38.061338,114.263582],[38.061281,114.263590],[38.061209,114.263601],[38.061137,114.263603],[38.061063,114.263606],[38.061013,114.263611],[38.060968,114.263625],[38.060920,114.263633],[38.060841,114.263657],[38.060765,114.263684],[38.060717,114.263713],[38.060628,114.263770],[38.060577,114.263802],[38.060535,114.263815],[38.060468,114.263831],[38.060425,114.263839],[38.060343,114.263861],[38.060303,114.263874],[38.060265,114.263888],[38.060229,114.263904]] },
+  { name:'支线7', color:'#aaaaaa', difficulty:'', level:'', dist:'', time:'', warn:'', branch:true, pts:[[38.061754,114.260390],[38.061771,114.260304],[38.061785,114.260237],[38.061798,114.260170],[38.061815,114.260084],[38.061826,114.260004],[38.061823,114.259918],[38.061830,114.259843],[38.061836,114.259749],[38.061840,114.259685],[38.061815,114.259604],[38.061771,114.259508],[38.061743,114.259462],[38.061703,114.259403],[38.061661,114.259336],[38.061600,114.259266],[38.061545,114.259223],[38.061494,114.259183],[38.061452,114.259146],[38.061407,114.259073],[38.061363,114.259006],[38.061327,114.258950],[38.061260,114.258904],[38.061181,114.258875],[38.061133,114.258861],[38.061076,114.258856],[38.061038,114.258834],[38.060958,114.258818],[38.060886,114.258840],[38.060825,114.258859],[38.060780,114.258861],[38.060730,114.258856],[38.060679,114.258859],[38.060658,114.258867],[38.060632,114.258872],[38.060592,114.258864],[38.060558,114.258840],[38.060518,114.258810],[38.060459,114.258770],[38.060419,114.258751],[38.060387,114.258735],[38.060354,114.258727],[38.060311,114.258724],[38.060256,114.258738],[38.060214,114.258743],[38.060159,114.258743],[38.060113,114.258746],[38.060073,114.258746],[38.060039,114.258754],[38.060001,114.258759]] },
+  { name:'支线8', color:'#aaaaaa', difficulty:'', level:'', dist:'', time:'', warn:'', branch:true, pts:[[38.060632,114.258875],[38.060653,114.258923],[38.060687,114.258969],[38.060715,114.259014],[38.060742,114.259049],[38.060757,114.259079]] }
+];
+
+ROUTES.forEach(function(r){
+  if(r.branch){
+    L.polyline(r.pts,{color:'white',weight:2.5,opacity:0.6,lineJoin:'round',lineCap:'round',dashArray:'7,6'}).addTo(map);
+  } else {
+    L.polyline(r.pts,{color:'white',weight:5.5,opacity:0.38,lineJoin:'round',lineCap:'round'}).addTo(map);
+    L.polyline(r.pts,{color:r.color,weight:3.5,opacity:0.95,lineJoin:'round',lineCap:'round'}).addTo(map);
+  }
+});
+
+// ============================================================
+// 图例
+// ============================================================
+(function(){
+  var html='<div class="sec">主要路线</div>';
+  ROUTES.filter(function(r){return !r.branch;}).forEach(function(r){
+    html+='<div class="route-card">'
+      +'<div class="rc-line" style="background:'+r.color+'"></div>'
+      +'<div class="rc-info">'
+        +'<span class="rc-name">'+r.name+'</span>'
+        +'<span class="rc-stars" style="color:'+r.color+'">'+r.difficulty+' <span class="rc-level">'+r.level+'</span></span>'
+        +'<span class="rc-meta">'+r.dist+' · '+r.time+'</span>'
+        +(r.warn ? '<span class="rc-warn" style="display:block">'+r.warn+'</span>' : '')
+      +'</div>'
+    +'</div>';
   });
+  html+='<div class="sec">支线</div>';
+  html+='<div class="row"><div class="l-line" style="background:#aaa;opacity:0.7;border-top:1px dashed #aaa;height:2px"></div><span style="opacity:0.6">辅助支线</span></div>';
+  html+='<div class="sec">标注</div>';
+  [['#7b5ea7','宗教场所'],['#b86018','景点'],['#2d7828','餐饮'],['#3d78a8','设施'],
+   ['#4a6fa5','停车场'],['#1d4ed8','学府'],['#6b7280','企业'],
+   ['#5c7a3e','亭子'],['#7c6f5e','遗址'],['#5c3d12','最高处']].forEach(function(t){
+    html+='<div class="row"><div class="l-dot" style="background:'+t[0]+'"></div><span>'+t[1]+'</span></div>';
+  });
+  document.getElementById('legend').innerHTML=html;
 })();
 
 // ============================================================
-// 路线管理
+// POI 图标 SVG
 // ============================================================
-var routes = [];
-var nextRouteId = 1;
-var drawing = null;   // 当前正在画的 route 对象
-var paused  = false;
-var previewLine = null;
-
-var STORAGE_ROUTES  = 'lingyan_routes_v2';
-var EMBEDDED_ROUTES = null; // exportFile 会将路线数据写入此处
-var STORAGE_MARKERS = 'lingyan_markers_v2';
-var STORAGE_CUSTOM  = 'lingyan_custom_v2';
-
-function saveRoutesToStorage() {
-  localStorage.setItem(STORAGE_ROUTES, JSON.stringify(
-    routes.map(function(r){ return { name:r.name, color:r.color, pts:r.pts }; })
-  ));
-}
-
-function renderLine(pts, existing, color) {
-  if (existing) {
-    if (existing._casing) map.removeLayer(existing._casing);
-    map.removeLayer(existing);
-  }
-  if (!pts || pts.length < 2) return null;
-  var casing = L.polyline(pts, { color:'white', weight:5.5, opacity:0.38, lineJoin:'round', lineCap:'round', renderer:canvasRenderer }).addTo(map);
-  var line   = L.polyline(pts, { color:color,   weight:3,   opacity:0.82, lineJoin:'round', lineCap:'round', renderer:canvasRenderer }).addTo(map);
-  line._casing = casing;
-  return line;
-}
-
-function renderRouteList() {
-  var list = document.getElementById('route-list');
-  list.innerHTML = '';
-  routes.forEach(function(r, i) {
-    var div = document.createElement('div');
-    div.className = 'route-row';
-    div.id = 'route-row-' + r.id;
-    div.innerHTML =
-      '<div class="route-swatch" style="background:'+r.color+'"></div>' +
-      '<span class="route-name" title="双击改名" ondblclick="renameRoute(routes['+i+'],this)" style="cursor:text;">'+r.name+'</span>' +
-      '<button class="route-btn" title="绘制" onclick="startDraw(routes['+i+'])">✏️</button>' +
-      '<button class="route-btn" title="清除路线" onclick="clearRoute(routes['+i+'])">🗑</button>';
-    list.appendChild(div);
-  });
-  renderLegend();
-}
-
-function addNewRoute(name, color, pts) {
-  var r = {
-    id: nextRouteId++,
-    name: name || ('路线' + nextRouteId),
-    color: color || selectedColor,
-    pts: pts || [],
-    line: null
-  };
-  r.line = renderLine(r.pts, null, r.color);
-  routes.push(r);
-  renderRouteList();
-  saveRoutesToStorage();
-  startDraw(r);
-}
-
-function clearRoute(r) {
-  if (drawing === r) finishDraw();
-  if (r.line) {
-    if (r.line._casing) map.removeLayer(r.line._casing);
-    map.removeLayer(r.line); r.line = null;
-  }
-  r.pts = [];
-  saveRoutesToStorage();
-  renderRouteList();
-}
-
-// ============================================================
-// 画线逻辑
-// ============================================================
-function startDraw(r) {
-  if (drawing) finishDraw();
-  drawing = r;
-  paused = false;
-  map.getContainer().style.cursor = 'crosshair';
-  document.getElementById('draw-ctrl').style.display = 'block';
-  document.getElementById('draw-label').textContent = r.name + ' 绘制中';
-  document.getElementById('draw-label').style.color = r.color;
-  document.getElementById('btn-pause').textContent = '⏸ 暂停';
-  document.getElementById('btn-pause').classList.remove('paused');
-  setStatus('「' + r.name + '」绘制中 · 单击添加点 · 双击完成', r.color);
-}
-
-function finishDraw() {
-  if (!drawing) return;
-  if (previewLine) { map.removeLayer(previewLine); previewLine = null; }
-  // 重新渲染确保线条保留
-  drawing.line = renderLine(drawing.pts, drawing.line, drawing.color);
-  saveRoutesToStorage();
-  drawing = null;
-  paused = false;
-  map.getContainer().style.cursor = '';
-  document.getElementById('draw-ctrl').style.display = 'none';
-  setStatus('标注可拖拽 · 选颜色后点「新增路线」开始绘制 · 点「新建地标」添加标注', null);
-}
-
-function togglePause() {
-  if (!drawing) return;
-  paused = !paused;
-  var btn = document.getElementById('btn-pause');
-  if (paused) {
-    btn.textContent = '▶ 继续'; btn.classList.add('paused');
-    map.getContainer().style.cursor = '';
-    if (previewLine) { map.removeLayer(previewLine); previewLine = null; }
-    setStatus('已暂停 · 可自由缩放移动 · 点「继续」接着画', null);
-  } else {
-    btn.textContent = '⏸ 暂停'; btn.classList.remove('paused');
-    map.getContainer().style.cursor = 'crosshair';
-    setStatus('「' + drawing.name + '」绘制中 · 单击添加点 · 双击完成', drawing.color);
-  }
-}
-
-function undoPoint() {
-  if (!drawing) return;
-  if (drawing.pts.length > 0) drawing.pts.pop();
-  drawing.line = renderLine(drawing.pts, drawing.line, drawing.color);
-}
-
-function clearDrawing() {
-  if (!drawing) return;
-  drawing.pts = [];
-  if (drawing.line) {
-    if (drawing.line._casing) map.removeLayer(drawing.line._casing);
-    map.removeLayer(drawing.line); drawing.line = null;
-  }
-}
-
-map.on('click', function(e) {
-  // 新建地标模式
-  if (addingLandmark) {
-    placeNewLandmark(e.latlng); return;
-  }
-  if (!drawing || paused) return;
-  drawing.pts.push([e.latlng.lat, e.latlng.lng]);
-  drawing.line = renderLine(drawing.pts, drawing.line, drawing.color);
-});
-
-map.on('mousemove', function(e) {
-  if (!drawing || paused) return;
-  if (drawing.pts.length === 0) return;
-  var preview = drawing.pts.concat([[e.latlng.lat, e.latlng.lng]]);
-  if (previewLine) map.removeLayer(previewLine);
-  previewLine = L.polyline(preview, {
-    color: drawing.color, weight:3, opacity:0.5,
-    dashArray:'6,5', lineJoin:'round', lineCap:'round'
-  }).addTo(map);
-});
-
-map.on('dblclick', function(e) {
-  if (!drawing || paused) return;
-  // 双击前 click 已加了一个多余的点，删掉
-  if (drawing.pts.length > 0) drawing.pts.pop();
-  finishDraw();
-});
-
-// ============================================================
-// 新建地标
-// ============================================================
-var addingLandmark = false;
-var customMarkers = [
-  { name:'萌宠乐园遗址', latlng:[38.063597,114.264995], color:'#8040c0' }
-];
-
-function toggleLandmark() {
-  addingLandmark = !addingLandmark;
-  var btn = document.getElementById('btn-lm');
-  if (addingLandmark) {
-    if (drawing) finishDraw();
-    map.getContainer().style.cursor = 'cell';
-    btn.style.background = 'rgba(20,60,120,0.88)';
-    btn.style.borderColor = '#60a0e0';
-    setStatus('点击地图放置地标 · 再次点击「新建地标」退出', '#4080d0');
-  } else {
-    map.getContainer().style.cursor = '';
-    btn.style.background = '';
-    btn.style.borderColor = '';
-    setStatus('标注可拖拽 · 选颜色后点「新增路线」开始绘制 · 点「新建地标」添加标注', null);
-  }
-}
-
-function placeNewLandmark(latlng) {
-  var name = prompt('地标名称：');
-  if (!name) { return; }
-  var m = addPOI([latlng.lat, latlng.lng], name, selectedColor, true);
-  customMarkers.push({ name: name, color: selectedColor, latlng: [latlng.lat, latlng.lng] });
-  saveCustomMarkers();
-  renderLegend();
-  // 退出地标模式
-  addingLandmark = false;
-  document.getElementById('btn-lm').style.background = '';
-  document.getElementById('btn-lm').style.borderColor = '';
-  map.getContainer().style.cursor = '';
-  setStatus('地标「' + name + '」已添加 · 可继续拖拽调整位置', null);
-}
-
-function saveCustomMarkers() {
-  localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(customMarkers));
-}
-
-// ============================================================
-// POI 标注（默认 + 自定义）
-// ============================================================
-var STORAGE_MARKERS_KEY = 'lingyan_markers';
-
-function loadSavedPos() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_MARKERS_KEY)) || {}; } catch(e) { return {}; }
-}
-function savePos(id, latlng) {
-  var s = loadSavedPos(); s[id] = [latlng.lat, latlng.lng];
-  localStorage.setItem(STORAGE_MARKERS_KEY, JSON.stringify(s));
-}
-
 var POI_SVG = {
-  // 宗教场所 - 莲花图标
-  '灵岩寺':       '<path d="M10 14 Q7 10 5 11 Q7 12 10 14z M10 14 Q13 10 15 11 Q13 12 10 14z M10 14 Q10 9 10 7" fill="white" stroke="white" stroke-width="0.3"/><path d="M10 14 Q6 8 4 9 Q7 11 10 14z M10 14 Q14 8 16 9 Q13 11 10 14z" fill="white" opacity="0.6"/>',
-  '财富宝塔':     '<polygon points="10,2 12,6 8,6" fill="white"/><rect x="7" y="6" width="6" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="6" y="8.2" width="8" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="5" y="10.4" width="10" height="2.2" fill="none" stroke="white" stroke-width="1"/><line x1="4" y1="13.5" x2="16" y2="13.5" stroke="white" stroke-width="1.5"/>',
-  // 餐饮
-  '素食餐厅':     '<path d="M7 3v6a3 3 0 006 0V3" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="12" x2="10" y2="17" stroke="white" stroke-width="1.4"/><line x1="7" y1="17" x2="13" y2="17" stroke="white" stroke-width="1.4"/>',
-  // 设施
-  '小卖部':       '<rect x="4" y="10" width="12" height="7" fill="none" stroke="white" stroke-width="1.3"/><path d="M3 10l7-6 7 6" fill="none" stroke="white" stroke-width="1.3"/><rect x="8" y="13" width="4" height="4" fill="white"/>',
-  '厕所':         '<circle cx="7" cy="5" r="1.8" fill="white"/><line x1="7" y1="7" x2="7" y2="12" stroke="white" stroke-width="1.2"/><line x1="4" y1="9" x2="10" y2="9" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="5" y2="17" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="17" stroke="white" stroke-width="1.2"/><circle cx="13" cy="5" r="1.8" fill="white"/><path d="M10 8q3 4 6 0l-1 9h-4z" fill="white"/>',
-  // 最高处
-  '最高处·亭子':  '<polygon points="10,3 18,15 2,15" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="3" x2="10" y2="1" stroke="white" stroke-width="1.2"/><line x1="9" y1="1" x2="13" y2="1" stroke="white" stroke-width="1.2"/>',
-  // 景点
-  '八卦田':       '<circle cx="10" cy="10" r="7" fill="none" stroke="white" stroke-width="1.2"/><line x1="10" y1="3" x2="10" y2="17" stroke="white" stroke-width="0.9"/><line x1="3" y1="10" x2="17" y2="10" stroke="white" stroke-width="0.9"/><line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="0.9"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="0.9"/>',
-  '萌宠乐园遗址': '<circle cx="7" cy="6" r="2" fill="white"/><circle cx="13" cy="6" r="2" fill="white"/><path d="M5 11q5 7 10 0Q13 8 10 9Q7 8 5 11z" fill="white"/>',
-  // 学府 - 书本图标
-  '融道学府':     '<rect x="5" y="5" width="10" height="12" rx="1" fill="none" stroke="white" stroke-width="1.3"/><line x1="8" y1="5" x2="8" y2="17" stroke="white" stroke-width="1"/><line x1="7" y1="8" x2="8" y2="8" stroke="white" stroke-width="1"/><line x1="7" y1="11" x2="8" y2="11" stroke="white" stroke-width="1"/><line x1="10" y1="8" x2="14" y2="8" stroke="white" stroke-width="0.9"/><line x1="10" y1="11" x2="14" y2="11" stroke="white" stroke-width="0.9"/><line x1="10" y1="14" x2="14" y2="14" stroke="white" stroke-width="0.9"/>',
-  // 企业 - 办公楼图标
-  '流量部':       '<rect x="4" y="5" width="12" height="13" fill="none" stroke="white" stroke-width="1.3"/><rect x="6" y="8" width="2" height="2" fill="white"/><rect x="9" y="8" width="2" height="2" fill="white"/><rect x="12" y="8" width="2" height="2" fill="white"/><rect x="6" y="12" width="2" height="2" fill="white"/><rect x="9" y="12" width="2" height="2" fill="white"/><rect x="12" y="12" width="2" height="2" fill="white"/><rect x="8" y="15" width="4" height="3" fill="white"/>',
-  // 停车场
-  '厕所②':       '<circle cx="7" cy="5" r="1.8" fill="white"/><line x1="7" y1="7" x2="7" y2="12" stroke="white" stroke-width="1.2"/><line x1="4" y1="9" x2="10" y2="9" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="5" y2="17" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="17" stroke="white" stroke-width="1.2"/><circle cx="13" cy="5" r="1.8" fill="white"/><path d="M10 8q3 4 6 0l-1 9h-4z" fill="white"/>',
-  '停车场①':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
-  '停车场②':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
-  '亭子①':      '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
-  '亭子②':      '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
-  '亭子③':      '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
-  '断壁遗址':    '<rect x="3" y="13" width="4" height="4" fill="white" opacity="0.9"/><rect x="8" y="11" width="4" height="6" fill="white" opacity="0.9"/><rect x="13" y="14" width="3" height="3" fill="white" opacity="0.9"/><rect x="3" y="9" width="2" height="3" fill="white" opacity="0.6"/><rect x="10" y="7" width="2" height="3" fill="white" opacity="0.6"/>'
+  '灵岩寺':      '<polygon points="10,2 12,6 8,6" fill="white"/><rect x="7" y="6" width="6" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="6" y="8.2" width="8" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="5" y="10.4" width="10" height="2.2" fill="none" stroke="white" stroke-width="1"/><line x1="4" y1="13.5" x2="16" y2="13.5" stroke="white" stroke-width="1.5"/>',
+  '财富宝塔':    '<polygon points="10,2 12,6 8,6" fill="white"/><rect x="7" y="6" width="6" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="6" y="8.2" width="8" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="5" y="10.4" width="10" height="2.2" fill="none" stroke="white" stroke-width="1"/><line x1="4" y1="13.5" x2="16" y2="13.5" stroke="white" stroke-width="1.5"/>',
+  '素食餐厅':    '<path d="M7 3v6a3 3 0 006 0V3" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="12" x2="10" y2="17" stroke="white" stroke-width="1.4"/><line x1="7" y1="17" x2="13" y2="17" stroke="white" stroke-width="1.4"/>',
+  '小卖部':      '<rect x="4" y="10" width="12" height="7" fill="none" stroke="white" stroke-width="1.3"/><path d="M3 10l7-6 7 6" fill="none" stroke="white" stroke-width="1.3"/><rect x="8" y="13" width="4" height="4" fill="white"/>',
+  '厕所':        '<circle cx="7" cy="5" r="1.8" fill="white"/><line x1="7" y1="7" x2="7" y2="12" stroke="white" stroke-width="1.2"/><line x1="4" y1="9" x2="10" y2="9" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="5" y2="17" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="17" stroke="white" stroke-width="1.2"/><circle cx="13" cy="5" r="1.8" fill="white"/><path d="M10 8q3 4 6 0l-1 9h-4z" fill="white"/>',
+  '厕所②':      '<circle cx="7" cy="5" r="1.8" fill="white"/><line x1="7" y1="7" x2="7" y2="12" stroke="white" stroke-width="1.2"/><line x1="4" y1="9" x2="10" y2="9" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="5" y2="17" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="17" stroke="white" stroke-width="1.2"/><circle cx="13" cy="5" r="1.8" fill="white"/><path d="M10 8q3 4 6 0l-1 9h-4z" fill="white"/>',
+  '最高处·亭子': '<polygon points="10,3 18,15 2,15" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="3" x2="10" y2="1" stroke="white" stroke-width="1.2"/><line x1="9" y1="1" x2="13" y2="1" stroke="white" stroke-width="1.2"/>',
+  '八卦田':      '<circle cx="10" cy="10" r="7" fill="none" stroke="white" stroke-width="1.2"/><line x1="10" y1="3" x2="10" y2="17" stroke="white" stroke-width="0.9"/><line x1="3" y1="10" x2="17" y2="10" stroke="white" stroke-width="0.9"/><line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="0.9"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="0.9"/>',
+  '萌宠乐园遗址':'<circle cx="7" cy="6" r="2" fill="white"/><circle cx="13" cy="6" r="2" fill="white"/><path d="M5 11q5 7 10 0Q13 8 10 9Q7 8 5 11z" fill="white"/>',
+  '融道学府':    '<rect x="5" y="5" width="10" height="12" rx="1" fill="none" stroke="white" stroke-width="1.3"/><line x1="8" y1="5" x2="8" y2="17" stroke="white" stroke-width="1"/><line x1="10" y1="8" x2="14" y2="8" stroke="white" stroke-width="0.9"/><line x1="10" y1="11" x2="14" y2="11" stroke="white" stroke-width="0.9"/><line x1="10" y1="14" x2="14" y2="14" stroke="white" stroke-width="0.9"/>',
+  '流量部':      '<rect x="4" y="5" width="12" height="13" fill="none" stroke="white" stroke-width="1.3"/><rect x="6" y="8" width="2" height="2" fill="white"/><rect x="9" y="8" width="2" height="2" fill="white"/><rect x="12" y="8" width="2" height="2" fill="white"/><rect x="6" y="12" width="2" height="2" fill="white"/><rect x="9" y="12" width="2" height="2" fill="white"/><rect x="12" y="12" width="2" height="2" fill="white"/><rect x="8" y="15" width="4" height="3" fill="white"/>',
+  '停车场①':    '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
+  '停车场②':    '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
+  '亭子①':     '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
+  '亭子②':     '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
+  '亭子③':     '<path d="M3 9l7-6 7 6" fill="white"/><rect x="5" y="9" width="10" height="1.5" fill="white"/><line x1="7" y1="10.5" x2="7" y2="17" stroke="white" stroke-width="1.3"/><line x1="13" y1="10.5" x2="13" y2="17" stroke="white" stroke-width="1.3"/><line x1="5" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3"/>',
+  '断壁遗址':   '<rect x="3" y="13" width="4" height="4" fill="white" opacity="0.9"/><rect x="8" y="11" width="4" height="6" fill="white" opacity="0.9"/><rect x="13" y="14" width="3" height="3" fill="white" opacity="0.9"/><rect x="3" y="9" width="2" height="3" fill="white" opacity="0.6"/><rect x="10" y="7" width="2" height="3" fill="white" opacity="0.6"/>'
 };
 
 function poiIcon(name, color) {
   var paths = POI_SVG[name] || '<circle cx="10" cy="10" r="5" fill="white"/>';
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="14" height="14">'+paths+'</svg>';
   return L.divIcon({
-    className: '',
-    html: '<div style="display:flex;flex-direction:column;align-items:center;cursor:grab;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));">' +
+    className:'',
+    html:'<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));">' +
       '<div style="background:'+color+';border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.9);">'+svg+'</div>' +
-      '<div style="background:rgba(0,0,0,0.72);color:white;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:2px;display:inline-block;margin-top:2px;letter-spacing:0.2px;white-space:nowrap;">'+name+'</div>' +
+      '<div style="background:rgba(0,0,0,0.72);color:white;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:2px;margin-top:2px;letter-spacing:0.2px;white-space:nowrap;">'+name+'</div>' +
       '</div>',
-    iconSize: null, iconAnchor: [13, 13]
+    iconSize:null, iconAnchor:[13,13]
   });
 }
 
-function addPOI(latlng, name, color, isCustom) {
-  var marker = L.marker(latlng, { icon: poiIcon(name, color), draggable: isAdmin, zIndexOffset: 500 }).addTo(map);
-  marker.on('dragend', function(e) {
-    savePos(name, e.target.getLatLng());
-    if (isCustom) {
-      // 更新自定义地标坐标
-      var ll = e.target.getLatLng();
-      customMarkers.forEach(function(m){ if(m.name===name){ m.latlng=[ll.lat,ll.lng]; } });
-      saveCustomMarkers();
-    }
-  });
-  return marker;
-}
-
-// 默认景点
-var defaultPOIs = [
-  { id:'最高处·亭子', latlng:[38.062520,114.259454], color:'#5c3d12' },
-  { id:'灵岩寺',      latlng:[38.065739,114.267415], color:'#7b5ea7' },
-  { id:'素食餐厅',    latlng:[38.065963,114.267962], color:'#2d7828' },
-  { id:'小卖部',      latlng:[38.064826,114.266720], color:'#3d78a8' },
-  { id:'流量部',      latlng:[38.064902,114.267935], color:'#6b7280' },
-  { id:'融道学府',    latlng:[38.064277,114.266487], color:'#1d4ed8' },
-  { id:'厕所',        latlng:[38.064778,114.267608], color:'#3d78a8' },
-  { id:'财富宝塔',    latlng:[38.065088,114.269646], color:'#7b5ea7' },
-  { id:'八卦田',      latlng:[38.065916,114.271224], color:'#b86018' },
-  { id:'停车场①',    latlng:[38.066389,114.268144], color:'#4a6fa5' },
-  { id:'厕所②',      latlng:[38.066389,114.268144], color:'#3d78a8' },
-  { id:'停车场②',    latlng:[38.064467,114.265068], color:'#4a6fa5' },
-  { id:'亭子①',      latlng:[38.059952,114.258797], color:'#5c7a3e' },
-  { id:'亭子②',      latlng:[38.060789,114.259151], color:'#5c7a3e' },
-  { id:'亭子③',      latlng:[38.061950,114.263448], color:'#5c7a3e' },
-  { id:'断壁遗址',    latlng:[38.059859,114.264035], color:'#7c6f5e' }
+// ============================================================
+// 标注（坐标已固化）
+// ============================================================
+var POIS = [
+  {id:'最高处·亭子', latlng:[38.062565,114.259290], color:'#5c3d12'},
+  {id:'灵岩寺',      latlng:[38.065739,114.267415], color:'#7b5ea7'},
+  {id:'素食餐厅',    latlng:[38.065963,114.267962], color:'#2d7828'},
+  {id:'小卖部',      latlng:[38.064725,114.266449], color:'#3d78a8'},
+  {id:'流量部',      latlng:[38.064902,114.267935], color:'#6b7280'},
+  {id:'融道学府',    latlng:[38.064277,114.266487], color:'#1d4ed8'},
+  {id:'厕所',        latlng:[38.064778,114.267608], color:'#3d78a8'},
+  {id:'财富宝塔',    latlng:[38.065088,114.269646], color:'#7b5ea7'},
+  {id:'八卦田',      latlng:[38.065916,114.271224], color:'#b86018'},
+  {id:'停车场①',    latlng:[38.066389,114.268144], color:'#4a6fa5'},
+  {id:'厕所②',      latlng:[38.066490,114.267431], color:'#3d78a8'},
+  {id:'停车场②',    latlng:[38.064467,114.265068], color:'#4a6fa5'},
+  {id:'亭子①',      latlng:[38.059952,114.258797], color:'#5c7a3e'},
+  {id:'亭子②',      latlng:[38.060789,114.259151], color:'#5c7a3e'},
+  {id:'亭子③',      latlng:[38.061950,114.263448], color:'#5c7a3e'},
+  {id:'断壁遗址',    latlng:[38.059859,114.264035], color:'#7c6f5e'},
+  {id:'萌宠乐园遗址',latlng:[38.063597,114.264995], color:'#8040c0'}
 ];
 
-(function loadMarkers() {
-  var saved = loadSavedPos();
-  defaultPOIs.forEach(function(p) {
-    var ll = saved[p.id] ? saved[p.id] : p.latlng;
-    addPOI(ll, p.id, p.color, false);
-  });
-  // 加载自定义地标
-  try {
-    var custom = JSON.parse(localStorage.getItem(STORAGE_CUSTOM)) || [];
-    custom.forEach(function(m) {
-      var ll = saved[m.name] ? saved[m.name] : m.latlng;
-      addPOI(ll, m.name, m.color, true);
-      customMarkers.push(m);
-    });
-  } catch(e) {}
-})();
-
-// ============================================================
-// 加载已保存路线
-// ============================================================
-(function loadRoutes() {
-  try {
-    var data = EMBEDDED_ROUTES || JSON.parse(localStorage.getItem(STORAGE_ROUTES)) || [];
-    if (data.length > 0) {
-      data.forEach(function(d) {
-        var r = { id: nextRouteId++, name: d.name, color: d.color, pts: d.pts || [], line: null };
-        r.line = renderLine(r.pts, null, r.color);
-        routes.push(r);
-      });
-    } else {
-      // 首次：创建两条默认路线（不自动进入画线模式）
-      routes.push({ id: nextRouteId++, name: '路线1', color: '#e07020', pts: [], line: null });
-      routes.push({ id: nextRouteId++, name: '路线2', color: '#2878c8', pts: [], line: null });
-    }
-  } catch(e) {
-    routes.push({ id: nextRouteId++, name: '路线1', color: '#e07020', pts: [], line: null });
-    routes.push({ id: nextRouteId++, name: '路线2', color: '#2878c8', pts: [], line: null });
-  }
-  renderRouteList();
-})();
-
-// ============================================================
-// 图例
-// ============================================================
-function renameRoute(r, el) {
-  var input = document.createElement('input');
-  input.value = r.name;
-  input.style.cssText = 'background:transparent;border:none;border-bottom:1px solid white;color:white;font-size:11px;width:70px;outline:none;';
-  el.replaceWith(input);
-  input.focus(); input.select();
-  function done() {
-    var val = input.value.trim();
-    if (val) { r.name = val; }
-    saveRoutesToStorage();
-    renderRouteList();
-    renderLegend();
-  }
-  input.addEventListener('blur', done);
-  input.addEventListener('keydown', function(e){ if(e.key==='Enter') input.blur(); });
-}
-
-function renderLegend() {
-  var html = '<div class="sec">路线</div>';
-  routes.forEach(function(r) {
-    if (r.pts.length > 0) {
-      html += '<div class="row"><div class="l-line" style="background:'+r.color+'"></div><span>'+r.name+'</span></div>';
-    }
-  });
-  html += '<div class="sec">标注</div>';
-  var dotTypes = [
-    { color:'#7b5ea7', label:'宗教场所' },
-    { color:'#b86018', label:'景点' },
-    { color:'#2d7828', label:'餐饮' },
-    { color:'#3d78a8', label:'设施' },
-    { color:'#1d4ed8', label:'学府' },
-    { color:'#6b7280', label:'企业' },
-    { color:'#4a6fa5', label:'停车场' },
-    { color:'#5c7a3e', label:'亭子' },
-    { color:'#7c6f5e', label:'遗址' },
-    { color:'#5c3d12', label:'最高处' }
-  ];
-  dotTypes.forEach(function(t){
-    html += '<div class="row"><div class="l-dot" style="background:'+t.color+'"></div><span>'+t.label+'</span></div>';
-  });
-  document.getElementById('legend').innerHTML = html;
-}
-
-// ============================================================
-// 状态栏
-// ============================================================
-// ============================================================
-// 截图模式
-// ============================================================
-var shotMode = false;
-function toggleShotMode(hide) {
-  shotMode = hide;
-  var els = ['#panel','#status-bar','#draw-ctrl','#shot-btn','#shot-tip','.leaflet-control-zoom','.leaflet-control-attribution'];
-  els.forEach(function(sel){
-    document.querySelectorAll(sel).forEach(function(el){
-      el.style.visibility = hide ? 'hidden' : '';
-    });
-  });
-}
-
-function exportHighRes() {
-  toggleShotMode(true);
-  setTimeout(function() {
-    html2canvas(document.body, {
-      useCORS: true, scale: 2, logging: false, allowTaint: false,
-      width: window.innerWidth, height: window.innerHeight
-    }).then(function(canvas) {
-      toggleShotMode(false);
-      var link = document.createElement('a');
-      link.download = '灵山登山路线图.png';
-      link.href = canvas.toDataURL('image/png', 1.0);
-      link.click();
-    }).catch(function() {
-      toggleShotMode(false);
-      alert('导出失败，请手动截图');
-    });
-  }, 600);
-}
-
-document.addEventListener('keydown', function(e){
-  if((e.key==='p'||e.key==='P') && !e.ctrlKey && !e.metaKey) exportHighRes();
+POIS.forEach(function(p){
+  L.marker(p.latlng, {icon:poiIcon(p.id,p.color), zIndexOffset:500}).addTo(map);
 });
 
-function setStatus(text, color) {
-  if (!isAdmin) return; // 非管理员不显示操作提示
-  var el = document.getElementById('status-bar');
-  el.textContent = text;
-  el.style.borderColor = color ? color : 'rgba(255,255,255,0.18)';
-  el.style.background   = color ? 'rgba(10,6,2,0.82)' : 'rgba(10,6,2,0.72)';
+// ============================================================
+// 入口标记
+// ============================================================
+var ENTRANCES = [
+  {id:'景区入口', latlng:[38.066144,114.272114], color:'#3ab54a'},
+  {id:'财富路线入口', latlng:[38.065141,114.267763], color:'#d4a020'}
+];
+function entranceIcon(name, color) {
+  return L.divIcon({
+    className:'',
+    html:'<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8));">'
+      +'<div style="background:'+color+';border-radius:6px;padding:3px 7px;border:2px solid white;display:flex;align-items:center;gap:4px;">'
+      +'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="12" height="12"><path d="M3 10l7-7 7 7" fill="none" stroke="white" stroke-width="2"/><rect x="5" y="10" width="10" height="8" fill="none" stroke="white" stroke-width="1.5"/><rect x="8" y="14" width="4" height="4" fill="white"/></svg>'
+      +'<span style="color:white;font-size:10px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;">'+name+'</span>'
+      +'</div>'
+      +'<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid '+color+';"></div>'
+      +'</div>',
+    iconAnchor:[35,38]
+  });
 }
+ENTRANCES.forEach(function(e){
+  L.marker(e.latlng, {icon:entranceIcon(e.id, e.color), zIndexOffset:1000}).addTo(map);
+});
 
 // ============================================================
-// 导出文件
+// 导出高清图（纯canvas方案，不依赖html2canvas）
 // ============================================================
-function exportFile() {
-  var savedPos = loadSavedPos();
+function exportHighRes() {
+  var scale = 2;
+  var W = window.innerWidth, H = window.innerHeight;
+  var canvas = document.createElement('canvas');
+  canvas.width  = W * scale;
+  canvas.height = H * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  var poisJS = defaultPOIs.map(function(p) {
-    var ll = savedPos[p.id] ? savedPos[p.id] : p.latlng;
-    return '  { id:\''+p.id+'\', latlng:['+ll[0].toFixed(6)+','+ll[1].toFixed(6)+'], color:\''+p.color+'\' }';
-  }).join(',\n');
+  // 抓取所有已加载的卫星瓦片并绘制到 canvas
+  var tiles = document.querySelectorAll('.leaflet-tile-pane img.leaflet-tile-loaded');
+  var pending = tiles.length || 1;
+  function onTileDone() {
+    pending--;
+    if (pending > 0) return;
+    drawOverlays();
+  }
+  if (tiles.length === 0) { drawOverlays(); return; }
+  tiles.forEach(function(img) {
+    var rect = img.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) { onTileDone(); return; }
+    var tmp = new Image();
+    tmp.crossOrigin = 'anonymous';
+    tmp.onload  = function() {
+      ctx.drawImage(tmp, rect.left*scale, rect.top*scale, rect.width*scale, rect.height*scale);
+      onTileDone();
+    };
+    tmp.onerror = function() { onTileDone(); };
+    tmp.src = img.src + (img.src.indexOf('?') >= 0 ? '&_=1' : '?_=1');
+  });
 
-  var customJS = customMarkers.map(function(m) {
-    var ll = savedPos[m.name] ? savedPos[m.name] : m.latlng;
-    return '  { name:\''+m.name+'\', latlng:['+ll[0].toFixed(6)+','+ll[1].toFixed(6)+'], color:\''+m.color+'\' }';
-  }).join(',\n');
+  function drawOverlays() {
+      // ---- 绘制路线 ----
+      ROUTES.forEach(function(r){
+        var pts = r.pts.map(function(ll){ return map.latLngToContainerPoint(ll); });
+        ctx.beginPath();
+        pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p.x*scale,p.y*scale) : ctx.lineTo(p.x*scale,p.y*scale); });
+        if(r.branch){
+          ctx.setLineDash([7*scale,6*scale]);
+          ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+          ctx.lineWidth = 2.5*scale;
+          ctx.lineJoin='round'; ctx.lineCap='round';
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else {
+          ctx.setLineDash([]);
+          ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+          ctx.lineWidth = 5.5*scale;
+          ctx.lineJoin='round'; ctx.lineCap='round';
+          ctx.stroke();
+          ctx.beginPath();
+          pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p.x*scale,p.y*scale) : ctx.lineTo(p.x*scale,p.y*scale); });
+          ctx.strokeStyle = r.color;
+          ctx.lineWidth = 3.5*scale;
+          ctx.stroke();
+        }
+      });
 
-  var routesJS = routes.map(function(r) {
-    var ptsStr = r.pts.length > 0
-      ? '[\n' + r.pts.map(function(p){ return '      ['+p[0].toFixed(6)+','+p[1].toFixed(6)+']'; }).join(',\n') + '\n    ]'
-      : '[]';
-    return '  { name:\''+r.name+'\', color:\''+r.color+'\', pts:'+ptsStr+' }';
-  }).join(',\n');
+      // ---- 绘制 POI 标注（带图标） ----
+      var R = 9 * scale;
+      var iconSize = 14 * scale;
+      ctx.font = 'bold ' + (9.5*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.textAlign = 'center';
+      var poiTotal = POIS.length, poiDone = 0;
+      function checkDone() {
+        poiDone++;
+        if (poiDone < poiTotal) return;
+        var link = document.createElement('a');
+        link.download = '灵山登山路线图.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      }
+      function drawPoiLabel(ctx, p, cx, cy) {
+        var label = p.id;
+        var tw = ctx.measureText(label).width;
+        var lh = 10 * scale, lpad = 4 * scale;
+        var lx = cx - tw/2 - lpad, ly = cy + R + 2*scale;
+        ctx.fillStyle = 'rgba(0,0,0,0.72)';
+        ctx.fillRect(lx, ly, tw + lpad*2, lh + 2*scale);
+        ctx.fillStyle = 'white';
+        ctx.fillText(label, cx, ly + lh - 1*scale);
+      }
+      POIS.forEach(function(p){
+        var pt = map.latLngToContainerPoint(p.latlng);
+        var cx = pt.x * scale, cy = pt.y * scale;
+        // 圆形背景
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 2 * scale;
+        ctx.stroke();
+        // 标签
+        drawPoiLabel(ctx, p, cx, cy);
+        // SVG图标
+        var paths = POI_SVG[p.id] || '<circle cx="10" cy="10" r="5" fill="white"/>';
+        var svgStr = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="'+iconSize+'" height="'+iconSize+'">'+paths+'</svg>';
+        var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+        var img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, cx - iconSize/2, cy - iconSize/2, iconSize, iconSize);
+          checkDone();
+        };
+        img.onerror = function() { checkDone(); };
+        img.src = svgUrl;
+      });
 
-  // 生成固化后的 HTML（坐标全部写死）
-  var out = document.documentElement.outerHTML;
-  out = out.replace(/var defaultPOIs = \[[\s\S]*?\];/, 'var defaultPOIs = [\n'+poisJS+'\n];');
-  out = out.replace(/customMarkers\s*=\s*\[[\s\S]*?\];/, 'customMarkers = [\n'+customJS+'\n];');
-  out = out.replace(/var EMBEDDED_ROUTES = [^;]*;/, 'var EMBEDDED_ROUTES = [\n'+routesJS+'\n];');
-  var blob = new Blob([out], { type:'text/html;charset=utf-8' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lingyan_map_saved.html';
-  a.click();
+      // ---- 绘制入口标记 ----
+      ENTRANCES.forEach(function(e){
+        var pt = map.latLngToContainerPoint(e.latlng);
+        var ex = pt.x * scale, ey = pt.y * scale;
+        ctx.font = 'bold '+(10*scale)+'px PingFang SC,Microsoft YaHei,sans-serif';
+        var etw = ctx.measureText(e.id).width;
+        var epad = 7*scale, ebh = 14*scale;
+        var ebw = etw + epad*2 + 16*scale;
+        var ebx = ex - ebw/2, eby = ey - ebh - 7*scale;
+        ctx.fillStyle = e.color;
+        ctx.fillRect(ebx, eby, ebw, ebh);
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2*scale;
+        ctx.strokeRect(ebx, eby, ebw, ebh);
+        // 文字
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.fillText(e.id, ex, eby + ebh - 3*scale);
+        // 小三角
+        ctx.beginPath();
+        ctx.moveTo(ex - 5*scale, eby + ebh);
+        ctx.lineTo(ex + 5*scale, eby + ebh);
+        ctx.lineTo(ex, eby + ebh + 7*scale);
+        ctx.fillStyle = e.color;
+        ctx.fill();
+      });
+
+      // ---- 绘制标题框 ----
+      var titleFont1 = 'bold ' + (17*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      var titleFont2 = (9.5*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.font = titleFont1;
+      var tw1 = ctx.measureText('登山路线图').width;
+      ctx.font = titleFont2;
+      var tw2 = ctx.measureText('太行灵山景区 · 白鹿泉').width;
+      var tboxW = Math.max(tw1, tw2) + 28*2*scale;
+      var tboxH = (9+17+4+9.5+8)*scale;
+      var tboxX = (W*scale - tboxW) / 2;
+      var tboxY = 18*scale;
+      ctx.fillStyle = 'rgba(10,6,2,0.72)';
+      ctx.fillRect(tboxX, tboxY, tboxW, tboxH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = scale;
+      ctx.strokeRect(tboxX, tboxY, tboxW, tboxH);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'white';
+      ctx.font = titleFont1;
+      ctx.letterSpacing = (5*scale)+'px';
+      ctx.fillText('登山路线图', W*scale/2, tboxY + 9*scale + 17*scale);
+      ctx.font = titleFont2;
+      ctx.letterSpacing = (2.5*scale)+'px';
+      ctx.globalAlpha = 0.72;
+      ctx.fillText('太行灵山景区 · 白鹿泉', W*scale/2, tboxY + 9*scale + 17*scale + 4*scale + 9.5*scale);
+      ctx.globalAlpha = 1;
+      ctx.letterSpacing = '0px';
+
+      // ---- 绘制图例 ----
+      var lFont  = 'bold ' + (11*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      var lsFont = (9*scale)  + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.font = lFont;
+      var poiCats = [['#7b5ea7','宗教场所'],['#b86018','景点'],['#2d7828','餐饮'],['#3d78a8','设施'],
+                     ['#4a6fa5','停车场'],['#1d4ed8','学府'],['#6b7280','企业'],
+                     ['#5c7a3e','亭子'],['#7c6f5e','遗址'],['#5c3d12','最高处']];
+      var mainRoutes = ROUTES.filter(function(r){return !r.branch;});
+      var warnCount = mainRoutes.filter(function(r){return r.warn;}).length;
+      var rows = mainRoutes.length*3 + warnCount + poiCats.length + 3;
+      var lRowH = 14*scale, lPad = 10*scale;
+      var lW = 145*scale, lH = lPad*2 + rows*lRowH;
+      var lX = 18*scale, lY = (H - 36)*scale - lH;
+      ctx.fillStyle = 'rgba(10,6,2,0.68)';
+      ctx.fillRect(lX, lY, lW, lH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = scale;
+      ctx.strokeRect(lX, lY, lW, lH);
+      ctx.textAlign = 'left';
+      var ly2 = lY + lPad;
+      function legendSection(label) {
+        ctx.font = lsFont;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText(label, lX+lPad, ly2 + 9*scale);
+        ly2 += lRowH;
+      }
+      function legendMainRoute(r) {
+        ctx.fillStyle = r.color;
+        ctx.fillRect(lX+lPad, ly2 + 4*scale, 24*scale, 5*scale);
+        ctx.font = 'bold '+(11*scale)+'px PingFang SC,Microsoft YaHei,sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.fillText(r.name, lX+lPad+30*scale, ly2 + 11*scale);
+        ly2 += lRowH;
+        // 星级 + 难度
+        ctx.font = (9*scale)+'px PingFang SC,Microsoft YaHei,sans-serif';
+        ctx.fillStyle = r.color;
+        ctx.fillText(r.difficulty + ' ' + r.level, lX+lPad+30*scale, ly2 + 9*scale);
+        ly2 += lRowH;
+        // 距离 + 用时 + 警示
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText(r.dist + ' · ' + r.time, lX+lPad+30*scale, ly2 + 9*scale);
+        ly2 += lRowH;
+        if(r.warn) {
+          ctx.fillStyle = '#ff9090';
+          ctx.fillText(r.warn, lX+lPad+30*scale, ly2 + 9*scale);
+          ly2 += lRowH;
+        }
+      }
+      function legendDot(color, name) {
+        ctx.beginPath();
+        ctx.arc(lX+lPad+5*scale, ly2+5*scale, 5*scale, 0, Math.PI*2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5*scale;
+        ctx.stroke();
+        ctx.font = lFont;
+        ctx.fillStyle = 'white';
+        ctx.fillText(name, lX+lPad+16*scale, ly2+10*scale);
+        ly2 += lRowH;
+      }
+      legendSection('主要路线');
+      mainRoutes.forEach(function(r){ legendMainRoute(r); });
+      legendSection('支线');
+      ctx.strokeStyle = '#aaaaaa'; ctx.setLineDash([4*scale,3*scale]); ctx.lineWidth=1.5*scale;
+      ctx.beginPath(); ctx.moveTo(lX+lPad, ly2+5*scale); ctx.lineTo(lX+lPad+24*scale, ly2+5*scale); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = lFont; ctx.fillStyle='rgba(255,255,255,0.55)';
+      ctx.fillText('辅助支线', lX+lPad+30*scale, ly2+10*scale);
+      ly2 += lRowH;
+      legendSection('标注');
+      poiCats.forEach(function(c){ legendDot(c[0], c[1]); });
+
+  }
 }
 </script>
-
-
 </body></html>
