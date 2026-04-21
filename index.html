@@ -435,16 +435,24 @@ function savePos(id, latlng) {
 }
 
 var POI_SVG = {
-  '灵岩寺':       '<path d="M10 3L3 9v8h14V9z" fill="none" stroke="white" stroke-width="1.4"/><path d="M1 9l9-6 9 6" fill="none" stroke="white" stroke-width="1.4"/><rect x="8" y="12" width="4" height="5" fill="white"/>',
-  '财富宝塔':     '<polygon points="10,2 12,6 8,6" fill="white"/><rect x="7" y="6" width="6" height="2.5" fill="none" stroke="white" stroke-width="1"/><rect x="6" y="8.5" width="8" height="2.5" fill="none" stroke="white" stroke-width="1"/><rect x="5" y="11" width="10" height="2.5" fill="none" stroke="white" stroke-width="1"/><line x1="4" y1="14" x2="16" y2="14" stroke="white" stroke-width="1.5"/>',
+  // 宗教场所 - 莲花图标
+  '灵岩寺':       '<path d="M10 14 Q7 10 5 11 Q7 12 10 14z M10 14 Q13 10 15 11 Q13 12 10 14z M10 14 Q10 9 10 7" fill="white" stroke="white" stroke-width="0.3"/><path d="M10 14 Q6 8 4 9 Q7 11 10 14z M10 14 Q14 8 16 9 Q13 11 10 14z" fill="white" opacity="0.6"/>',
+  '财富宝塔':     '<polygon points="10,2 12,6 8,6" fill="white"/><rect x="7" y="6" width="6" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="6" y="8.2" width="8" height="2.2" fill="none" stroke="white" stroke-width="1"/><rect x="5" y="10.4" width="10" height="2.2" fill="none" stroke="white" stroke-width="1"/><line x1="4" y1="13.5" x2="16" y2="13.5" stroke="white" stroke-width="1.5"/>',
+  // 餐饮
   '素食餐厅':     '<path d="M7 3v6a3 3 0 006 0V3" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="12" x2="10" y2="17" stroke="white" stroke-width="1.4"/><line x1="7" y1="17" x2="13" y2="17" stroke="white" stroke-width="1.4"/>',
+  // 设施
   '小卖部':       '<rect x="4" y="10" width="12" height="7" fill="none" stroke="white" stroke-width="1.3"/><path d="M3 10l7-6 7 6" fill="none" stroke="white" stroke-width="1.3"/><rect x="8" y="13" width="4" height="4" fill="white"/>',
   '厕所':         '<circle cx="7" cy="5" r="1.8" fill="white"/><line x1="7" y1="7" x2="7" y2="12" stroke="white" stroke-width="1.2"/><line x1="4" y1="9" x2="10" y2="9" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="5" y2="17" stroke="white" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="17" stroke="white" stroke-width="1.2"/><circle cx="13" cy="5" r="1.8" fill="white"/><path d="M10 8q3 4 6 0l-1 9h-4z" fill="white"/>',
+  // 最高处
   '最高处·亭子':  '<polygon points="10,3 18,15 2,15" fill="none" stroke="white" stroke-width="1.4"/><line x1="10" y1="3" x2="10" y2="1" stroke="white" stroke-width="1.2"/><line x1="9" y1="1" x2="13" y2="1" stroke="white" stroke-width="1.2"/>',
+  // 景点
   '八卦田':       '<circle cx="10" cy="10" r="7" fill="none" stroke="white" stroke-width="1.2"/><line x1="10" y1="3" x2="10" y2="17" stroke="white" stroke-width="0.9"/><line x1="3" y1="10" x2="17" y2="10" stroke="white" stroke-width="0.9"/><line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="0.9"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="0.9"/>',
-  '融道学府':     '<rect x="4" y="10" width="12" height="7" fill="none" stroke="white" stroke-width="1.3"/><path d="M2 10l8-6 8 6" fill="none" stroke="white" stroke-width="1.3"/><line x1="10" y1="4" x2="10" y2="2" stroke="white" stroke-width="1.2"/><rect x="7" y="13" width="6" height="4" fill="white"/>',
-  '流量部':       '<rect x="5" y="7" width="10" height="10" fill="none" stroke="white" stroke-width="1.3"/><rect x="8" y="4" width="4" height="3" fill="none" stroke="white" stroke-width="1"/><rect x="7" y="10" width="2.5" height="2.5" fill="white"/><rect x="10.5" y="10" width="2.5" height="2.5" fill="white"/>',
   '萌宠乐园遗址': '<circle cx="7" cy="6" r="2" fill="white"/><circle cx="13" cy="6" r="2" fill="white"/><path d="M5 11q5 7 10 0Q13 8 10 9Q7 8 5 11z" fill="white"/>',
+  // 学府 - 书本图标
+  '融道学府':     '<rect x="5" y="5" width="10" height="12" rx="1" fill="none" stroke="white" stroke-width="1.3"/><line x1="8" y1="5" x2="8" y2="17" stroke="white" stroke-width="1"/><line x1="7" y1="8" x2="8" y2="8" stroke="white" stroke-width="1"/><line x1="7" y1="11" x2="8" y2="11" stroke="white" stroke-width="1"/><line x1="10" y1="8" x2="14" y2="8" stroke="white" stroke-width="0.9"/><line x1="10" y1="11" x2="14" y2="11" stroke="white" stroke-width="0.9"/><line x1="10" y1="14" x2="14" y2="14" stroke="white" stroke-width="0.9"/>',
+  // 企业 - 办公楼图标
+  '流量部':       '<rect x="4" y="5" width="12" height="13" fill="none" stroke="white" stroke-width="1.3"/><rect x="6" y="8" width="2" height="2" fill="white"/><rect x="9" y="8" width="2" height="2" fill="white"/><rect x="12" y="8" width="2" height="2" fill="white"/><rect x="6" y="12" width="2" height="2" fill="white"/><rect x="9" y="12" width="2" height="2" fill="white"/><rect x="12" y="12" width="2" height="2" fill="white"/><rect x="8" y="15" width="4" height="3" fill="white"/>',
+  // 停车场
   '停车场①':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>',
   '停车场②':     '<text x="10" y="14" font-size="13" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">P</text>'
 };
@@ -479,13 +487,13 @@ function addPOI(latlng, name, color, isCustom) {
 // 默认景点
 var defaultPOIs = [
   { id:'最高处·亭子', latlng:[38.062520,114.259454], color:'#5c3d12' },
-  { id:'灵岩寺', latlng:[38.065739,114.267415], color:'#b86018' },
+  { id:'灵岩寺', latlng:[38.065739,114.267415], color:'#7b5ea7' },
   { id:'素食餐厅', latlng:[38.065963,114.268021], color:'#2d7828' },
   { id:'小卖部', latlng:[38.064826,114.266720], color:'#3d78a8' },
-  { id:'流量部', latlng:[38.064902,114.267935], color:'#a04a18' },
-  { id:'融道学府', latlng:[38.064277,114.266487], color:'#b86018' },
+  { id:'流量部', latlng:[38.064902,114.267935], color:'#6b7280' },
+  { id:'融道学府', latlng:[38.064277,114.266487], color:'#1d4ed8' },
   { id:'厕所', latlng:[38.064778,114.267608], color:'#3d78a8' },
-  { id:'财富宝塔', latlng:[38.065088,114.269646], color:'#b86018' },
+  { id:'财富宝塔', latlng:[38.065088,114.269646], color:'#7b5ea7' },
   { id:'八卦田',    latlng:[38.065916,114.271224], color:'#b86018' },
   { id:'停车场①', latlng:[38.066248,114.268219], color:'#4a6fa5' },
   { id:'停车场②', latlng:[38.064467,114.265068], color:'#4a6fa5' }
@@ -561,9 +569,13 @@ function renderLegend() {
   });
   html += '<div class="sec">标注</div>';
   var dotTypes = [
+    { color:'#7b5ea7', label:'宗教场所' },
     { color:'#b86018', label:'景点' },
-    { color:'#3d78a8', label:'设施' },
     { color:'#2d7828', label:'餐饮' },
+    { color:'#3d78a8', label:'设施' },
+    { color:'#1d4ed8', label:'学府' },
+    { color:'#6b7280', label:'企业' },
+    { color:'#4a6fa5', label:'停车场' },
     { color:'#5c3d12', label:'最高处' }
   ];
   dotTypes.forEach(function(t){
