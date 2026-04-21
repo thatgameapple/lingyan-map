@@ -237,9 +237,7 @@ function exportHighRes() {
         var lh = 10 * scale, lpad = 4 * scale;
         var lx = cx - tw/2 - lpad, ly = cy + R + 2*scale;
         ctx.fillStyle = 'rgba(0,0,0,0.72)';
-        ctx.beginPath();
-        ctx.roundRect(lx, ly, tw + lpad*2, lh + 2*scale, 2*scale);
-        ctx.fill();
+        ctx.fillRect(lx, ly, tw + lpad*2, lh + 2*scale);
         // 标签文字
         ctx.fillStyle = 'white';
         ctx.fillText(label, cx, ly + lh - 1*scale);
