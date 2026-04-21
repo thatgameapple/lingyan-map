@@ -193,6 +193,30 @@ POIS.forEach(function(p){
 });
 
 // ============================================================
+// 入口标记
+// ============================================================
+var ENTRANCES = [
+  {id:'景区入口', latlng:[38.066550,114.272250]},
+  {id:'入口',     latlng:[38.065600,114.267700]}
+];
+function entranceIcon(name) {
+  return L.divIcon({
+    className:'',
+    html:'<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8));">'
+      +'<div style="background:#16a34a;border-radius:6px;padding:3px 7px;border:2px solid white;display:flex;align-items:center;gap:4px;">'
+      +'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="12" height="12"><path d="M3 10l7-7 7 7" fill="none" stroke="white" stroke-width="2"/><rect x="5" y="10" width="10" height="8" fill="none" stroke="white" stroke-width="1.5"/><rect x="8" y="14" width="4" height="4" fill="white"/></svg>'
+      +'<span style="color:white;font-size:10px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;">'+name+'</span>'
+      +'</div>'
+      +'<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #16a34a;"></div>'
+      +'</div>',
+    iconAnchor:[30,38]
+  });
+}
+ENTRANCES.forEach(function(e){
+  L.marker(e.latlng, {icon:entranceIcon(e.id), zIndexOffset:1000}).addTo(map);
+});
+
+// ============================================================
 // 导出高清图（纯canvas方案，不依赖html2canvas）
 // ============================================================
 function exportHighRes() {
@@ -302,6 +326,33 @@ function exportHighRes() {
         };
         img.onerror = function() { checkDone(); };
         img.src = svgUrl;
+      });
+
+      // ---- 绘制入口标记 ----
+      ENTRANCES.forEach(function(e){
+        var pt = map.latLngToContainerPoint(e.latlng);
+        var ex = pt.x * scale, ey = pt.y * scale;
+        ctx.font = 'bold '+(10*scale)+'px PingFang SC,Microsoft YaHei,sans-serif';
+        var etw = ctx.measureText(e.id).width;
+        var epad = 7*scale, ebh = 14*scale;
+        var ebw = etw + epad*2 + 16*scale;
+        var ebx = ex - ebw/2, eby = ey - ebh - 7*scale;
+        // 绿色背景框
+        ctx.fillStyle = '#16a34a';
+        ctx.fillRect(ebx, eby, ebw, ebh);
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2*scale;
+        ctx.strokeRect(ebx, eby, ebw, ebh);
+        // 文字
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.fillText(e.id, ex, eby + ebh - 3*scale);
+        // 小三角
+        ctx.beginPath();
+        ctx.moveTo(ex - 5*scale, eby + ebh);
+        ctx.lineTo(ex + 5*scale, eby + ebh);
+        ctx.lineTo(ex, eby + ebh + 7*scale);
+        ctx.fillStyle = '#16a34a';
+        ctx.fill();
       });
 
       // ---- 绘制标题框 ----
