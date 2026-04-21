@@ -225,6 +225,7 @@ var paused  = false;
 var previewLine = null;
 
 var STORAGE_ROUTES  = 'lingyan_routes_v2';
+var EMBEDDED_ROUTES = null; // exportFile 会将路线数据写入此处
 var STORAGE_MARKERS = 'lingyan_markers_v2';
 var STORAGE_CUSTOM  = 'lingyan_custom_v2';
 
@@ -531,7 +532,7 @@ var defaultPOIs = [
 // ============================================================
 (function loadRoutes() {
   try {
-    var data = JSON.parse(localStorage.getItem(STORAGE_ROUTES)) || [];
+    var data = EMBEDDED_ROUTES || JSON.parse(localStorage.getItem(STORAGE_ROUTES)) || [];
     if (data.length > 0) {
       data.forEach(function(d) {
         var r = { id: nextRouteId++, name: d.name, color: d.color, pts: d.pts || [], line: null };
@@ -670,8 +671,8 @@ function exportFile() {
   // 生成固化后的 HTML（坐标全部写死）
   var out = document.documentElement.outerHTML;
   out = out.replace(/var defaultPOIs = \[[\s\S]*?\];/, 'var defaultPOIs = [\n'+poisJS+'\n];');
-  out = out.replace(/customMarkers\s*=\s*\[\];/, 'customMarkers = [\n'+customJS+'\n];');
-  // 清空 localStorage 调用（已固化，不再需要）
+  out = out.replace(/customMarkers\s*=\s*\[[\s\S]*?\];/, 'customMarkers = [\n'+customJS+'\n];');
+  out = out.replace(/var EMBEDDED_ROUTES = [^;]*;/, 'var EMBEDDED_ROUTES = [\n'+routesJS+'\n];');
   var blob = new Blob([out], { type:'text/html;charset=utf-8' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
