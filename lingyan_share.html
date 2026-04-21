@@ -252,6 +252,84 @@ function exportHighRes() {
         ctx.fillText(label, cx, ly + lh - 1*scale);
       });
 
+      // ---- 绘制标题框 ----
+      var titleFont1 = 'bold ' + (17*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      var titleFont2 = (9.5*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.font = titleFont1;
+      var tw1 = ctx.measureText('登山路线图').width;
+      ctx.font = titleFont2;
+      var tw2 = ctx.measureText('太行灵山景区 · 白鹿泉').width;
+      var tboxW = Math.max(tw1, tw2) + 28*2*scale;
+      var tboxH = (9+17+4+9.5+8)*scale;
+      var tboxX = (W*scale - tboxW) / 2;
+      var tboxY = 18*scale;
+      ctx.fillStyle = 'rgba(10,6,2,0.72)';
+      ctx.fillRect(tboxX, tboxY, tboxW, tboxH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = scale;
+      ctx.strokeRect(tboxX, tboxY, tboxW, tboxH);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'white';
+      ctx.font = titleFont1;
+      ctx.letterSpacing = (5*scale)+'px';
+      ctx.fillText('登山路线图', W*scale/2, tboxY + 9*scale + 17*scale);
+      ctx.font = titleFont2;
+      ctx.letterSpacing = (2.5*scale)+'px';
+      ctx.globalAlpha = 0.72;
+      ctx.fillText('太行灵山景区 · 白鹿泉', W*scale/2, tboxY + 9*scale + 17*scale + 4*scale + 9.5*scale);
+      ctx.globalAlpha = 1;
+      ctx.letterSpacing = '0px';
+
+      // ---- 绘制图例 ----
+      var lFont  = 'bold ' + (11*scale) + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      var lsFont = (9*scale)  + 'px PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.font = lFont;
+      var poiCats = [['#7b5ea7','宗教场所'],['#b86018','景点'],['#2d7828','餐饮'],['#3d78a8','设施'],
+                     ['#4a6fa5','停车场'],['#1d4ed8','学府'],['#6b7280','企业'],
+                     ['#5c7a3e','亭子'],['#7c6f5e','遗址'],['#5c3d12','最高处']];
+      var rows = ROUTES.length + poiCats.length + 2; // 2 section headers
+      var lRowH = 16*scale, lPad = 10*scale;
+      var lW = 130*scale, lH = lPad*2 + rows*lRowH + 2*lRowH;
+      var lX = 18*scale, lY = (H - 36)*scale - lH;
+      ctx.fillStyle = 'rgba(10,6,2,0.68)';
+      ctx.fillRect(lX, lY, lW, lH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = scale;
+      ctx.strokeRect(lX, lY, lW, lH);
+      ctx.textAlign = 'left';
+      var ly2 = lY + lPad;
+      function legendSection(label) {
+        ctx.font = lsFont;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText(label, lX+lPad, ly2 + 9*scale);
+        ly2 += lRowH;
+      }
+      function legendRoute(color, name) {
+        ctx.fillStyle = color;
+        ctx.fillRect(lX+lPad, ly2 + 4*scale, 24*scale, 4*scale);
+        ctx.font = lFont;
+        ctx.fillStyle = 'white';
+        ctx.fillText(name, lX+lPad+30*scale, ly2 + 11*scale);
+        ly2 += lRowH;
+      }
+      function legendDot(color, name) {
+        ctx.beginPath();
+        ctx.arc(lX+lPad+5*scale, ly2+6*scale, 5*scale, 0, Math.PI*2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5*scale;
+        ctx.stroke();
+        ctx.font = lFont;
+        ctx.fillStyle = 'white';
+        ctx.fillText(name, lX+lPad+16*scale, ly2+11*scale);
+        ly2 += lRowH;
+      }
+      legendSection('路线');
+      ROUTES.forEach(function(r){ legendRoute(r.color, r.name); });
+      legendSection('标注');
+      poiCats.forEach(function(c){ legendDot(c[0], c[1]); });
+
       var link = document.createElement('a');
       link.download = '灵山登山路线图.png';
       link.href = canvas.toDataURL('image/png', 1.0);
