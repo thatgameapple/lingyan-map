@@ -5,7 +5,6 @@
 <title>灵山景区登山路线图</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 * { box-sizing:border-box; }
 body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif; }
@@ -63,7 +62,7 @@ var map = L.map('map', {
   zoomControl:true, doubleClickZoom:false
 });
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  attribution:'Tiles © Esri', maxZoom:19
+  attribution:'Tiles © Esri', maxZoom:19, crossOrigin:'anonymous'
 }).addTo(map);
 
 // ============================================================
@@ -172,31 +171,41 @@ POIS.forEach(function(p){
 });
 
 // ============================================================
-// 导出高清图
+// 导出高清图（纯canvas方案，不依赖html2canvas）
 // ============================================================
 function exportHighRes() {
   var scale = 2;
   var W = window.innerWidth, H = window.innerHeight;
+  var canvas = document.createElement('canvas');
+  canvas.width  = W * scale;
+  canvas.height = H * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 隐藏 Leaflet 覆盖层（路线、标注），只让 html2canvas 捕获卫星底图
-  var overlayPane  = document.querySelector('.leaflet-overlay-pane');
-  var markerPane   = document.querySelector('.leaflet-marker-pane');
-  var shadowPane   = document.querySelector('.leaflet-shadow-pane');
-  [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display='none'; });
+  // 抓取所有已加载的卫星瓦片并绘制到 canvas
+  var tiles = document.querySelectorAll('.leaflet-tile-pane img.leaflet-tile-loaded');
+  var pending = tiles.length || 1;
+  function onTileDone() {
+    pending--;
+    if (pending > 0) return;
+    drawOverlays();
+  }
+  if (tiles.length === 0) { drawOverlays(); return; }
+  tiles.forEach(function(img) {
+    var rect = img.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) { onTileDone(); return; }
+    var tmp = new Image();
+    tmp.crossOrigin = 'anonymous';
+    tmp.onload  = function() {
+      ctx.drawImage(tmp, rect.left*scale, rect.top*scale, rect.width*scale, rect.height*scale);
+      onTileDone();
+    };
+    tmp.onerror = function() { onTileDone(); };
+    tmp.src = img.src + (img.src.indexOf('?') >= 0 ? '&_=1' : '?_=1');
+  });
 
-  setTimeout(function(){
-    html2canvas(document.body, {
-      useCORS:true, scale:scale, logging:false, allowTaint:false,
-      width:W, height:H,
-      ignoreElements:function(el){
-        if(['shot-btn','legend','title-box'].indexOf(el.id) >= 0) return true;
-        if(el.classList && el.classList.contains('leaflet-control-container')) return true;
-        return false;
-      }
-    }).then(function(canvas){
-      [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display=''; });
-      var ctx = canvas.getContext('2d');
-
+  function drawOverlays() {
       // ---- 绘制路线 ----
       ROUTES.forEach(function(r){
         var pts = r.pts.map(function(ll){ return map.latLngToContainerPoint(ll); });
@@ -247,10 +256,7 @@ function exportHighRes() {
       link.download = '灵山登山路线图.png';
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
-    }).catch(function(){
-      [overlayPane, markerPane, shadowPane].forEach(function(el){ if(el) el.style.display=''; });
-    });
-  }, 600);
+  }
 }
 </script>
 </body></html>
