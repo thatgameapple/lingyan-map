@@ -255,7 +255,7 @@ function renderRouteList() {
     div.id = 'route-row-' + r.id;
     div.innerHTML =
       '<div class="route-swatch" style="background:'+r.color+'"></div>' +
-      '<span class="route-name">'+r.name+'</span>' +
+      '<span class="route-name" title="双击改名" ondblclick="renameRoute(routes['+i+'],this)" style="cursor:text;">'+r.name+'</span>' +
       '<button class="route-btn" title="绘制" onclick="startDraw(routes['+i+'])">✏️</button>' +
       '<button class="route-btn" title="清除路线" onclick="clearRoute(routes['+i+'])">🗑</button>';
     list.appendChild(div);
@@ -531,6 +531,23 @@ var defaultPOIs = [
 // ============================================================
 // 图例
 // ============================================================
+function renameRoute(r, el) {
+  var input = document.createElement('input');
+  input.value = r.name;
+  input.style.cssText = 'background:transparent;border:none;border-bottom:1px solid white;color:white;font-size:11px;width:70px;outline:none;';
+  el.replaceWith(input);
+  input.focus(); input.select();
+  function done() {
+    var val = input.value.trim();
+    if (val) { r.name = val; }
+    saveRoutesToStorage();
+    renderRouteList();
+    renderLegend();
+  }
+  input.addEventListener('blur', done);
+  input.addEventListener('keydown', function(e){ if(e.key==='Enter') input.blur(); });
+}
+
 function renderLegend() {
   var html = '<div class="sec">路线</div>';
   routes.forEach(function(r) {
