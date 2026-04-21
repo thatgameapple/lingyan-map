@@ -58,7 +58,6 @@ body { margin:0; padding:0; font-family:'PingFang SC','Hiragino Sans GB','Micros
 // ============================================================
 // 地图初始化
 // ============================================================
-var canvasRenderer = L.canvas({ padding:0.5 });
 var map = L.map('map', {
   center:[38.0630, 114.2645], zoom:16,
   zoomControl:true, doubleClickZoom:false
@@ -88,8 +87,8 @@ var ROUTES = [
 ];
 
 ROUTES.forEach(function(r){
-  L.polyline(r.pts,{color:'white',weight:5.5,opacity:0.38,lineJoin:'round',lineCap:'round',renderer:canvasRenderer}).addTo(map);
-  L.polyline(r.pts,{color:r.color,weight:3,opacity:0.92,lineJoin:'round',lineCap:'round',renderer:canvasRenderer}).addTo(map);
+  L.polyline(r.pts,{color:'white',weight:5.5,opacity:0.38,lineJoin:'round',lineCap:'round'}).addTo(map);
+  L.polyline(r.pts,{color:r.color,weight:3,opacity:0.92,lineJoin:'round',lineCap:'round'}).addTo(map);
 });
 
 // ============================================================
@@ -176,23 +175,21 @@ POIS.forEach(function(p){
 // 导出高清图
 // ============================================================
 function exportHighRes() {
-  var btn = document.getElementById('shot-btn');
-  var legend = document.getElementById('legend');
-  var title = document.getElementById('title-box');
-  var ctrl = document.querySelector('.leaflet-control-container');
-  [btn,legend,title,ctrl].forEach(function(el){ if(el) el.style.visibility='hidden'; });
+  var skipIds = new Set(['shot-btn','legend','title-box']);
   setTimeout(function(){
     html2canvas(document.body,{
       useCORS:true, scale:2, logging:false, allowTaint:false,
-      width:window.innerWidth, height:window.innerHeight
+      width:window.innerWidth, height:window.innerHeight,
+      ignoreElements:function(el){
+        if(skipIds.has(el.id)) return true;
+        if(el.classList && el.classList.contains('leaflet-control-container')) return true;
+        return false;
+      }
     }).then(function(canvas){
-      [btn,legend,title,ctrl].forEach(function(el){ if(el) el.style.visibility=''; });
       var link=document.createElement('a');
       link.download='灵山登山路线图.png';
       link.href=canvas.toDataURL('image/png',1.0);
       link.click();
-    }).catch(function(){
-      [btn,legend,title,ctrl].forEach(function(el){ if(el) el.style.visibility=''; });
     });
   },600);
 }
