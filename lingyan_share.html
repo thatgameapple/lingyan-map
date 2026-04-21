@@ -93,7 +93,7 @@ var ROUTES = [
 
 ROUTES.forEach(function(r){
   if(r.branch){
-    L.polyline(r.pts,{color:'#aaaaaa',weight:1.8,opacity:0.7,lineJoin:'round',lineCap:'round',dashArray:'6,5'}).addTo(map);
+    L.polyline(r.pts,{color:'white',weight:2.5,opacity:0.6,lineJoin:'round',lineCap:'round',dashArray:'7,6'}).addTo(map);
   } else {
     L.polyline(r.pts,{color:'white',weight:5.5,opacity:0.38,lineJoin:'round',lineCap:'round'}).addTo(map);
     L.polyline(r.pts,{color:r.color,weight:3.5,opacity:0.95,lineJoin:'round',lineCap:'round'}).addTo(map);
@@ -231,9 +231,9 @@ function exportHighRes() {
         ctx.beginPath();
         pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p.x*scale,p.y*scale) : ctx.lineTo(p.x*scale,p.y*scale); });
         if(r.branch){
-          ctx.setLineDash([6*scale,5*scale]);
-          ctx.strokeStyle = 'rgba(180,180,180,0.7)';
-          ctx.lineWidth = 1.8*scale;
+          ctx.setLineDash([7*scale,6*scale]);
+          ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+          ctx.lineWidth = 2.5*scale;
           ctx.lineJoin='round'; ctx.lineCap='round';
           ctx.stroke();
           ctx.setLineDash([]);
