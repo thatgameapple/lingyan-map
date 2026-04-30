@@ -1,5 +1,4 @@
-import pkg from '/Users/czw/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/index.js';
-const { chromium } = pkg;
+import { chromium } from 'playwright';
 
 import { fileURLToPath } from 'url';
 import path from 'path';
