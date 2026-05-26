@@ -11,12 +11,12 @@ const outPath   = path.join(__dirname, '灵山登山路线图.png');
 const browser = await chromium.launch({
   headless: false,
   channel: 'chrome',
-  args: ['--window-size=1312,960', '--window-position=3000,0']  // 先放到屏幕外
+  args: ['--window-size=1440,1080', '--window-position=3000,0']  // 先放到屏幕外
 });
 
 const ctx  = await browser.newContext({ deviceScaleFactor: 2 });
 const page = await ctx.newPage();
-await page.setViewportSize({ width: 1312, height: 870 });
+await page.setViewportSize({ width: 1432, height: 990 });
 
 await page.goto('file://' + htmlPath, { waitUntil: 'networkidle', timeout: 30000 });
 
@@ -27,7 +27,12 @@ await page.waitForFunction(() => {
 }, { timeout: 20000 });
 
 await page.evaluate(() => {
-  map.setView([38.0630, 114.2645], 16, { animate: false });
+  // 包含全部 POI + 路线 + 入口
+  var bounds = L.latLngBounds([
+    [38.0593, 114.2580],
+    [38.0670, 114.2730]
+  ]);
+  map.fitBounds(bounds, { padding: [40, 40], animate: false });
 });
 
 await page.waitForTimeout(500);

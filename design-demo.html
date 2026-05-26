@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>地图UI设计方向对比</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0a0a0a; font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif; }
+
+/* 顶部说明 */
+.header { text-align:center; padding:32px 20px 24px; color:white; }
+.header h1 { font-size:18px; font-weight:300; letter-spacing:6px; opacity:0.8; }
+.header p  { font-size:12px; opacity:0.4; margin-top:8px; letter-spacing:2px; }
+
+/* 三列布局 */
+.demos { display:flex; gap:0; }
+.demo  { flex:1; position:relative; height:680px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); }
+.demo-label {
+  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.6); color:rgba(255,255,255,0.5);
+  font-size:11px; letter-spacing:2px; padding:4px 12px; border-radius:2px;
+  white-space:nowrap; z-index:100;
+}
+
+/* 卫星图模拟背景 */
+.sat-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 60% 35%, rgba(45,55,35,0.9) 0%, transparent 55%),
+    radial-gradient(ellipse at 30% 60%, rgba(30,40,25,0.8) 0%, transparent 45%),
+    radial-gradient(ellipse at 75% 70%, rgba(50,40,30,0.7) 0%, transparent 40%),
+    linear-gradient(135deg, #1a1f15 0%, #0f1a0a 30%, #151a10 60%, #0a0f08 100%);
+}
+.sat-texture {
+  position:absolute; inset:0; opacity:0.15;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 4px);
+}
+/* 路线模拟 */
+.route-sim { position:absolute; inset:0; }
+.route-sim svg { width:100%; height:100%; }
+
+/* ============================================================
+   方向一：东方极简
+   ============================================================ */
+.demo-1 .title-1 {
+  position:absolute; top:24px; left:50%; transform:translateX(-50%);
+  z-index:10; text-align:center; pointer-events:none;
+}
+.demo-1 .title-1 h2 {
+  font-size:20px; font-weight:200; color:white; letter-spacing:10px;
+  text-shadow:0 0 30px rgba(255,255,255,0.3);
+}
+.demo-1 .title-1 p {
+  font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:4px; margin-top:6px;
+  border-top:1px solid rgba(255,255,255,0.15); padding-top:5px;
+}
+
+.demo-1 .legend-1 {
+  position:absolute; bottom:48px; left:16px; z-index:10;
+  color:white; min-width:120px;
+}
+.demo-1 .legend-1 .l1-sec {
+  font-size:8px; color:rgba(255,255,255,0.3); letter-spacing:3px;
+  margin-bottom:8px; padding-bottom:4px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.demo-1 .legend-1 .l1-route {
+  display:flex; align-items:center; gap:10px; margin-bottom:9px;
+}
+.demo-1 .legend-1 .l1-line {
+  width:20px; height:1px; flex-shrink:0;
+}
+.demo-1 .legend-1 .l1-name { font-size:11px; font-weight:300; letter-spacing:2px; }
+.demo-1 .legend-1 .l1-meta { font-size:8px; color:rgba(255,255,255,0.35); letter-spacing:1px; margin-top:1px; }
+
+.demo-1 .btn-1 {
+  position:absolute; top:24px; left:16px; z-index:10;
+  color:rgba(255,255,255,0.6); font-size:10px; letter-spacing:3px;
+  font-weight:300; cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:3px;
+  background:none; border-top:none; border-left:none; border-right:none;
+}
+
+.demo-1 .dot-1 {
+  position:absolute; top:50%; left:55%; transform:translate(-50%,-50%);
+  z-index:10;
+}
+.demo-1 .dot-core { width:8px; height:8px; border-radius:50%; background:white; }
+.demo-1 .dot-ring {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:20px; height:20px; border-radius:50%;
+  border:1px solid rgba(255,255,255,0.4);
+  animation:ring1 2s ease-out infinite;
+}
+.demo-1 .dot-ring2 {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid rgba(255,255,255,0.15);
+  animation:ring1 2s ease-out infinite 0.5s;
+}
+@keyframes ring1 {
+  0%   { transform:translate(-50%,-50%) scale(0.5); opacity:0.8; }
+  100% { transform:translate(-50%,-50%) scale(1.5); opacity:0; }
+}
+
+/* ============================================================
+   方向二：军事地图风
+   ============================================================ */
+.demo-2 .mil-grid {
+  position:absolute; inset:0; opacity:0.06;
+  background-image:
+    linear-gradient(rgba(0,255,100,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,100,1) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.demo-2 .mil-scan {
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 0%, rgba(0,255,80,0.03) 50%, transparent 100%);
+  animation:scan 4s linear infinite;
+}
+@keyframes scan {
+  0%   { transform:translateY(-100%); }
+  100% { transform:translateY(100%); }
+}
+
+.demo-2 .title-2 {
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  z-index:10; text-align:center;
+  border:1px solid rgba(0,255,80,0.3); padding:8px 20px;
+  background:rgba(0,10,0,0.7); backdrop-filter:blur(4px);
+}
+.demo-2 .title-2::before {
+  content:''; position:absolute; top:-4px; left:-4px; right:-4px; bottom:-4px;
+  border:1px solid rgba(0,255,80,0.1);
+}
+.demo-2 .title-2 .t2-tag {
+  font-size:8px; color:#00ff50; letter-spacing:4px; font-family:monospace;
+  margin-bottom:4px;
+}
+.demo-2 .title-2 h2 {
+  font-size:16px; font-weight:600; color:white; letter-spacing:4px;
+}
+.demo-2 .title-2 p {
+  font-size:8px; color:rgba(0,255,80,0.5); letter-spacing:2px; margin-top:3px; font-family:monospace;
+}
+
+.demo-2 .legend-2 {
+  position:absolute; bottom:48px; left:16px; z-index:10;
+  background:rgba(0,8,0,0.82); border:1px solid rgba(0,255,80,0.2);
+  padding:10px 12px; min-width:140px;
+}
+.demo-2 .legend-2::before {
+  content:'ROUTE DATA'; position:absolute; top:-8px; left:8px;
+  font-size:7px; color:#00ff50; letter-spacing:2px; font-family:monospace;
+  background:rgba(0,8,0,1); padding:0 4px;
+}
+.demo-2 .l2-route { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.demo-2 .l2-line  { width:20px; height:2px; flex-shrink:0; }
+.demo-2 .l2-name  { font-size:10px; color:#ccffcc; font-family:monospace; letter-spacing:1px; }
+.demo-2 .l2-meta  { font-size:8px; color:rgba(0,255,80,0.4); font-family:monospace; }
+
+.demo-2 .btn-2 {
+  position:absolute; top:20px; left:16px; z-index:10;
+  background:rgba(0,8,0,0.8); border:1px solid rgba(0,255,80,0.3);
+  color:#00ff50; font-size:10px; letter-spacing:2px; padding:5px 10px;
+  cursor:pointer; font-family:monospace;
+}
+.demo-2 .btn-2::before { content:'[ '; }
+.demo-2 .btn-2::after  { content:' ]'; }
+
+.demo-2 .dot-2 {
+  position:absolute; top:48%; left:52%; z-index:10;
+}
+.demo-2 .dot-2-core {
+  width:10px; height:10px; background:#00ff50;
+  clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.demo-2 .dot-2-ring {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:28px; height:28px; border:1px solid rgba(0,255,80,0.5);
+  animation:ring2 1.5s ease-out infinite;
+}
+@keyframes ring2 {
+  0%   { transform:translate(-50%,-50%) scale(0.3); opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(1.8); opacity:0; }
+}
+
+/* ============================================================
+   方向三：磨砂玻璃极简
+   ============================================================ */
+.demo-3 .title-3 {
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  z-index:10; text-align:center;
+  background:rgba(255,255,255,0.1); backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.2); border-radius:12px;
+  padding:10px 24px; white-space:nowrap;
+}
+.demo-3 .title-3 h2 {
+  font-size:16px; font-weight:500; color:white; letter-spacing:5px;
+}
+.demo-3 .title-3 p {
+  font-size:9px; color:rgba(255,255,255,0.5); letter-spacing:2px; margin-top:3px;
+}
+
+.demo-3 .legend-3 {
+  position:absolute; bottom:48px; left:16px; z-index:10;
+  background:rgba(255,255,255,0.08); backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+  padding:12px 14px; min-width:130px;
+}
+.demo-3 .l3-sec {
+  font-size:8px; color:rgba(255,255,255,0.3); letter-spacing:2px;
+  margin-bottom:8px;
+}
+.demo-3 .l3-route { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.demo-3 .l3-pill  {
+  width:28px; height:6px; border-radius:3px; flex-shrink:0;
+}
+.demo-3 .l3-info .l3-name { font-size:11px; color:white; font-weight:500; }
+.demo-3 .l3-info .l3-meta { font-size:9px; color:rgba(255,255,255,0.4); margin-top:1px; }
+
+.demo-3 .btn-3 {
+  position:absolute; top:20px; left:16px; z-index:10;
+  background:rgba(255,255,255,0.12); backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.2); border-radius:8px;
+  color:white; font-size:11px; letter-spacing:1px; padding:6px 12px;
+  cursor:pointer; font-family:inherit;
+}
+
+.demo-3 .dot-3 {
+  position:absolute; top:50%; left:54%; transform:translate(-50%,-50%);
+  z-index:10;
+}
+.demo-3 .dot-3-core {
+  width:14px; height:14px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #70b8ff, #2563eb);
+  border:2.5px solid white;
+  box-shadow:0 0 0 4px rgba(37,99,235,0.3), 0 2px 8px rgba(0,0,0,0.4);
+}
+.demo-3 .dot-3-pulse {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(37,99,235,0.25);
+  animation:pulse3 2s ease-out infinite;
+}
+@keyframes pulse3 {
+  0%   { transform:translate(-50%,-50%) scale(0.5); opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(1.8); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>地图 UI 设计方向</h1>
+  <p>三种风格对比 · 选择你最喜欢的方向</p>
+</div>
+
+<div class="demos">
+
+  <!-- 方向一：东方极简 -->
+  <div class="demo demo-1">
+    <div class="sat-bg"></div>
+    <div class="sat-texture"></div>
+    <div class="route-sim">
+      <svg viewBox="0 0 400 680" preserveAspectRatio="none">
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8"/>
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="#3ab54a" stroke-width="3"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="#d4a020" stroke-width="2.5"/>
+      </svg>
+    </div>
+
+    <div class="title-1">
+      <h2>登山路线图</h2>
+      <p>太行灵山景区 · 白鹿泉</p>
+    </div>
+
+    <button class="btn-1">回到景区</button>
+
+    <div class="legend-1">
+      <div class="l1-sec">路线</div>
+      <div class="l1-route">
+        <div class="l1-line" style="background:#3ab54a"></div>
+        <div><div class="l1-name">经典路线</div><div class="l1-meta">1.4km · 30分钟</div></div>
+      </div>
+      <div class="l1-route">
+        <div class="l1-line" style="background:#d4a020"></div>
+        <div><div class="l1-name">财富路线</div><div class="l1-meta">1.2km · 28分钟</div></div>
+      </div>
+      <div class="l1-route">
+        <div class="l1-line" style="background:#cc2020"></div>
+        <div><div class="l1-name">断壁探险</div><div class="l1-meta">⚠ 需户外经验</div></div>
+      </div>
+    </div>
+
+    <div class="dot-1">
+      <div class="dot-ring2"></div>
+      <div class="dot-ring"></div>
+      <div class="dot-core"></div>
+    </div>
+
+    <div class="demo-label">① 东方极简</div>
+  </div>
+
+  <!-- 方向二：军事地图风 -->
+  <div class="demo demo-2">
+    <div class="sat-bg"></div>
+    <div class="sat-texture"></div>
+    <div class="mil-grid"></div>
+    <div class="mil-scan"></div>
+    <div class="route-sim">
+      <svg viewBox="0 0 400 680" preserveAspectRatio="none">
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="rgba(0,255,80,0.2)" stroke-width="8"/>
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="#00cc44" stroke-width="2.5" stroke-dasharray="8,3"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="rgba(255,180,0,0.2)" stroke-width="6"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="#ffb300" stroke-width="2" stroke-dasharray="6,3"/>
+      </svg>
+    </div>
+
+    <div class="title-2">
+      <div class="t2-tag">MAP-001 · ACTIVE</div>
+      <h2>登山路线图</h2>
+      <p>太行灵山景区 · 白鹿泉 · N38°</p>
+    </div>
+
+    <button class="btn-2">回到景区</button>
+
+    <div class="legend-2">
+      <div class="l2-route">
+        <div class="l2-line" style="background:#00cc44"></div>
+        <div><div class="l2-name">经典路线</div><div class="l2-meta">1.4KM / 30MIN</div></div>
+      </div>
+      <div class="l2-route">
+        <div class="l2-line" style="background:#ffb300"></div>
+        <div><div class="l2-name">财富路线</div><div class="l2-meta">1.2KM / 28MIN</div></div>
+      </div>
+      <div class="l2-route">
+        <div class="l2-line" style="background:#ff3030"></div>
+        <div><div class="l2-name">断壁探险</div><div class="l2-meta">⚠ EXP REQUIRED</div></div>
+      </div>
+    </div>
+
+    <div class="dot-2">
+      <div class="dot-2-ring"></div>
+      <div class="dot-2-core"></div>
+    </div>
+
+    <div class="demo-label">② 军事地图风</div>
+  </div>
+
+  <!-- 方向三：磨砂玻璃 -->
+  <div class="demo demo-3">
+    <div class="sat-bg"></div>
+    <div class="sat-texture"></div>
+    <div class="route-sim">
+      <svg viewBox="0 0 400 680" preserveAspectRatio="none">
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8"/>
+        <path d="M360,80 Q300,120 260,160 Q220,200 200,240 Q180,280 160,320 Q140,360 120,400 Q100,440 90,480 Q80,520 85,560" fill="none" stroke="#4ade80" stroke-width="3"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+        <path d="M200,240 Q220,260 240,280 Q260,300 260,340 Q260,380 240,400 Q220,420 200,440 Q180,460 160,480 Q140,500 130,520" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+      </svg>
+    </div>
+
+    <div class="title-3">
+      <h2>登山路线图</h2>
+      <p>太行灵山景区 · 白鹿泉</p>
+    </div>
+
+    <button class="btn-3">🏔 回到景区</button>
+
+    <div class="legend-3">
+      <div class="l3-sec">主要路线</div>
+      <div class="l3-route">
+        <div class="l3-pill" style="background:#4ade80"></div>
+        <div class="l3-info"><div class="l3-name">经典路线</div><div class="l3-meta">1.4km · 轻松</div></div>
+      </div>
+      <div class="l3-route">
+        <div class="l3-pill" style="background:#fbbf24"></div>
+        <div class="l3-info"><div class="l3-name">财富路线</div><div class="l3-meta">1.2km · 普通</div></div>
+      </div>
+      <div class="l3-route">
+        <div class="l3-pill" style="background:#f87171"></div>
+        <div class="l3-info"><div class="l3-name">断壁探险</div><div class="l3-meta">0.2km · 挑战</div></div>
+      </div>
+    </div>
+
+    <div class="dot-3">
+      <div class="dot-3-pulse"></div>
+      <div class="dot-3-core"></div>
+    </div>
+
+    <div class="demo-label">③ 磨砂玻璃极简</div>
+  </div>
+
+</div>
+
+</body></html>
